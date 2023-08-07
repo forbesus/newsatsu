@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+from newsatsu.users.models import Union
 
 
 class Construction(models.Model):
+    union = models.ForeignKey(Union, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(_("工事名"), max_length=255)
     content = models.TextField(_("工事内容"))
     start_time = models.DateField(_("予定工期 ー 開始"))
