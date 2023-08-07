@@ -13,9 +13,14 @@ class User(AbstractUser):
     check forms.SignupForm and forms.SocialSignupForms accordingly.
     """
 
+    class UserTypeModel(models.TextChoices):
+        UNION = _("管理組合"), "union"
+        COMPANY = _("施工会社"), "company"
+
     # First and last name do not cover name patterns around the globe
-    name = models.CharField(_("User"), blank=True, max_length=255)
+    name = models.CharField(_("会社名"), blank=True, max_length=255)
     area = models.CharField(_("地域"), max_length=20)
+    user_type = models.CharField(max_length=20, choices=UserTypeModel.choices)
 
     # address
     post_code = models.CharField(_("郵便番号"), max_length=20)
@@ -37,7 +42,7 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"username": self.username})
 
 
-class Union(models.Model):
+class UnionModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def year_choices():
@@ -69,7 +74,7 @@ class Union(models.Model):
         verbose_name_plural = "管理組合"
 
 
-class Company(models.Model):
+class CompanyModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     # 会社規模
     capital_stock = models.FloatField(_("資本金"))

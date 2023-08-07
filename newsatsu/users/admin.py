@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from newsatsu.users.forms import UserAdminChangeForm, UserAdminCreationForm
 
-from .models import Company, Union
+from .models import CompanyModel, UnionModel
 
 User = get_user_model()
 
@@ -26,6 +26,7 @@ class UserAdmin(auth_admin.UserAdmin):
             {
                 "fields": (
                     "username",
+                    "user_type",
                     "area",
                     "post_code",
                     "prefecture",
@@ -54,5 +55,5 @@ class UserAdmin(auth_admin.UserAdmin):
     search_fields = ["name"]
 
 
-admin.site.register(Union)
-admin.site.register(Company)
+admin.site.register(UnionModel)
+admin.site.register(CompanyModel)
