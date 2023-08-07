@@ -61,6 +61,9 @@ class Union(models.Model):
     # date time
     estimated_construction_time = models.DateField(_("想定工事時期"), null=True, blank=True)
 
+    def __str__(self) -> str:
+        return self.user.name
+
     class Meta:
         verbose_name = "管理組合"
         verbose_name_plural = "管理組合"
@@ -75,6 +78,9 @@ class Company(models.Model):
 
     founded_year = models.DateField(_("設立年"))
     business_condition = models.BooleanField(_("直近3期赤字の有無"))
+
+    def __str__(self) -> str:
+        return self.user.name
 
     class Meta:
         verbose_name = "施工会社"

@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 from newsatsu.users.forms import UserAdminChangeForm, UserAdminCreationForm
 
+from .models import Company, Union
+
 User = get_user_model()
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
@@ -19,7 +21,22 @@ class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
     fieldsets = (
-        (None, {"fields": ("username", "password")}),
+        (
+            None,
+            {
+                "fields": (
+                    "username",
+                    "area",
+                    "post_code",
+                    "prefecture",
+                    "city",
+                    "house_number",
+                    "building_name",
+                    "url",
+                    "password",
+                )
+            },
+        ),
         (_("Personal info"), {"fields": ("name", "email")}),
         (
             _("Permissions"),
@@ -28,8 +45,6 @@ class UserAdmin(auth_admin.UserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
-                    "groups",
-                    "user_permissions",
                 ),
             },
         ),
@@ -37,3 +52,7 @@ class UserAdmin(auth_admin.UserAdmin):
     )
     list_display = ["username", "name", "is_superuser"]
     search_fields = ["name"]
+
+
+admin.site.register(Union)
+admin.site.register(Company)
