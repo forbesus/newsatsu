@@ -5,6 +5,14 @@ from newsatsu.users.models import UnionModel
 
 
 class ConstructionModel(models.Model):
+    class ConstructionStatus(models.TextChoices):
+        REQUEST = _("見積依頼"), "request Quotation"
+        QA = _("質疑応答"), "question and answer"
+        BID = _("入札"), "bidding"
+        HEARING = _("ヒアリング会"), "hearing party"
+        HIRING = _("採用"), "hiring"
+        EVALUATION = _("入評価登録札"), "evaluation"
+
     union = models.ForeignKey(UnionModel, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(_("工事名"), max_length=255)
     content = models.TextField(_("工事内容"))
@@ -30,6 +38,8 @@ class ConstructionModel(models.Model):
     # 工事保険
     site_insurance = models.BooleanField(_("大規模修繕瑕疵保険加入"), null=True, blank=True)
     guarantee_insurance = models.BooleanField(_("履行保証保険加入"), null=True, blank=True)
+
+    status = models.CharField(choices=ConstructionStatus.choices, default=ConstructionStatus.REQUEST, max_length=30)
 
     def save(self, *args, **kwargs) -> None:
         if self.not_selected:
