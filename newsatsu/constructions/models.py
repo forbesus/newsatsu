@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from newsatsu.users.models import UnionModel
+from newsatsu.users.models import CompanyModel, UnionModel
 
 
 class ConstructionModel(models.Model):
@@ -41,6 +41,9 @@ class ConstructionModel(models.Model):
 
     status = models.CharField(choices=ConstructionStatus.choices, default=ConstructionStatus.REQUEST, max_length=30)
 
+    def __str__(self):
+        return f"{self.name}"
+
     def save(self, *args, **kwargs) -> None:
         if self.not_selected:
             self.first_engineer = False
@@ -51,3 +54,36 @@ class ConstructionModel(models.Model):
     class Meta:
         verbose_name = "工事"
         verbose_name_plural = "工事"
+
+
+class RequestCompanyModel(models.Model):
+    class RequestCompanyStatus(models.TextChoices):
+        REQUSTING = _("見積依頼中"), "requesting"
+        REQUEST_ACCEPT = _("見積依頼"), "accept request"
+        REQUEST_DECLINE = _("見積辞退"), "decline request"
+        REQUEST_UNSUCCESSFUL = _("落選"), "unsuccessful"
+        QA = _("質疑応答"), "question and answer"
+        BID = _("入札"), "bidding"
+        HEARING_REQUESTING = _("ヒアリング会への招待中"), "request hearing"
+        HEARING_ACCEPT = _("ヒアリング会承認"), "accept hearing"
+        HEARING_DECLINE = _("ヒアリング会へ拒否"), "accept decline"
+        HIRING = _("採用中"), "hiring"
+        HIRED = _("採用"), "hired"
+        HIRING_UNSUCCESSFUL = _("採用落選"), "unsuccessful hire"
+        FINISHED_WORK = _("作業終了"), "finished work"
+        EVALUATION = _("入評価登録札"), "evaluation"
+
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, default=True)
+    amount = models.FloatField(default=0)
+    message = models.TextField(null=True, blank=True)
+    status = models.CharField(
+        choices=RequestCompanyStatus.choices, default=RequestCompanyStatus.REQUSTING, max_length=20
+    )
+
+    def __str__(self):
+        return f"{self.company.user.name}"
+
+    class Meta:
+        verbose_name = "見積依頼会社"
+        verbose_name_plural = "見積依頼会社"
