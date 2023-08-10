@@ -58,7 +58,7 @@ class ConstructionModel(models.Model):
 
 class RequestCompanyModel(models.Model):
     class RequestCompanyStatus(models.TextChoices):
-        REQUSTING = _("見積依頼中"), "requesting"
+        REQUESTING = _("見積依頼中"), "requesting"
         REQUEST_ACCEPT = _("見積依頼"), "accept request"
         REQUEST_DECLINE = _("見積辞退"), "decline request"
         REQUEST_UNSUCCESSFUL = _("落選"), "unsuccessful"
@@ -78,7 +78,7 @@ class RequestCompanyModel(models.Model):
     amount = models.FloatField(default=0)
     message = models.TextField(null=True, blank=True)
     status = models.CharField(
-        choices=RequestCompanyStatus.choices, default=RequestCompanyStatus.REQUSTING, max_length=20
+        choices=RequestCompanyStatus.choices, default=RequestCompanyStatus.REQUESTING, max_length=20
     )
 
     def __str__(self):
