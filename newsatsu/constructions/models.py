@@ -8,7 +8,8 @@ from newsatsu.utils.models import TimeStampModel
 class ConstructionModel(models.Model):
     class ConstructionStatus(models.TextChoices):
         REQUEST = _("見積依頼"), "request Quotation"
-        QA = _("質疑応答"), "question and answer"
+        QUESTION = _("質問"), "question"
+        ANSWER = _("応答"), "answer"
         BID = _("入札"), "bidding"
         HEARING = _("ヒアリング会"), "hearing party"
         HIRING = _("採用"), "hiring"
@@ -60,24 +61,12 @@ class ConstructionModel(models.Model):
 class RequestCompanyModel(models.Model):
     class RequestCompanyStatus(models.TextChoices):
         REQUESTING = _("見積依頼中")
-        REQUEST_ACCEPT = _("見積依頼")
-        REQUEST_DECLINE = _("見積辞退")
+        ACCEPT = _("見積依頼")
+        DECLINE = _("見積辞退")
         REQUEST_UNSUCCESSFUL = _("落選")
-        QA = _("質疑応答")
-        BID = _("入札")
-        HEARING_REQUESTING = _("ヒアリング会への招待中")
-        HEARING_ACCEPT = _("ヒアリング会承認")
-        HEARING_DECLINE = _("ヒアリング会へ拒否")
-        HIRING = _("採用中")
-        HIRED = _("採用")
-        HIRING_UNSUCCESSFUL = _("採用落選")
-        FINISHED_WORK = _("作業終了")
-        EVALUATION = _("入評価登録札")
 
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
-    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, default=True)
-    amount = models.FloatField(default=0)
-    message = models.TextField(null=True, blank=True)
+
     status = models.CharField(
         choices=RequestCompanyStatus.choices, default=RequestCompanyStatus.REQUESTING, max_length=20
     )
@@ -90,7 +79,7 @@ class RequestCompanyModel(models.Model):
         verbose_name_plural = "見積依頼会社"
 
 
-class RequestQuestion(TimeStampModel):
+class RequestQuestionModel(TimeStampModel):
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True)
     content = models.TextField(_("質問"))
@@ -103,7 +92,7 @@ class RequestQuestion(TimeStampModel):
         verbose_name_plural = "質問"
 
 
-class RequestAnswer(TimeStampModel):
+class RequestAnswerModel(TimeStampModel):
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
     question = models.CharField(max_length=1024)
     answer = models.TextField()
@@ -114,3 +103,52 @@ class RequestAnswer(TimeStampModel):
     class Meta:
         verbose_name = "応答"
         verbose_name_plural = "応答"
+
+
+class BidModel(TimeStampModel):
+    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, blank=True)
+    amount = models.FloatField(default=0)
+    message = models.TextField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "入札会社"
+        verbose_name_plural = "入札会社"
+
+
+class HearingModel(TimeStampModel):
+    class HearingStatus(models.TextChoices):
+        REQUESTING = _("ヒアリング会への招待中")
+        ACCEPT = _("ヒアリング会承認")
+        DECLINE = _("ヒアリング会へ拒否")
+
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, blank=True)
+
+    status = models.CharField(choices=HearingStatus.choices, default=HearingStatus.REQUESTING, max_length=20)
+
+    location = models.CharField(_("住所"), max_length=30)
+    start_time = models.DateTimeField(_("開始日"))
+    contact_number = models.CharField(_("連絡番号"), max_length=30)
+
+    class Meta:
+        verbose_name = "ヒアリング会"
+        verbose_name_plural = "ヒアリング会"
+
+
+class HireModel(models.Model):
+    class HireStatus(models.TextChoices):
+        REQUESTING = _("採用中")
+        ACCEPT = _("採用承認")
+        DECLINE = _("採用辞退")
+        WORK_UNSUCCESSFUL = _("採用落選")
+        FINISHED_WORK = _("作業終了")
+        EVALUATION = _("入評価登録札")
+
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, blank=True)
+
+    status = models.CharField(choices=HireStatus.choices, default=HireStatus.REQUESTING, max_length=20)
+
+    class Meta:
+        verbose_name = "採用"
+        verbose_name_plural = "採用"
