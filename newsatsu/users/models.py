@@ -5,6 +5,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from newsatsu.utils.models import TimeStampModel
+
 
 class User(AbstractUser):
     """
@@ -84,9 +86,35 @@ class CompanyModel(models.Model):
     founded_year = models.DateField(_("設立年"))
     business_condition = models.BooleanField(_("直近3期赤字の有無"))
 
+    # 経営事項審査
+    architecture_rating_value = models.CharField(_("総合評定値(建築)"), null=True, blank=True)
+    waterproof_rating_value = models.CharField(_("総合評定値(防水)"), null=True, blank=True)
+    painting_rating_value = models.CharField(_("総合評定値(塗装)"), null=True, blank=True)
+
     def __str__(self) -> str:
         return self.user.name
 
     class Meta:
         verbose_name = "施工会社"
         verbose_name_plural = "施工会社"
+
+
+class CompanyAchievementModel(TimeStampModel):
+    class AchievementType(models.TextChoices):
+        SUB = _("下請"), "subcontractor"
+        PRIME = _("元請"), "prime contractor"
+
+    company = models.ForeignKey(CompanyModel, on_delete=models.CASCADE)
+
+    type = models.CharField(choices=AchievementType.choices, max_length=20)
+    title = models.CharField(max_length=512)
+    content = models.TextField()
+
+    price = models.FloatField()
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        verbose_name = "実績"
+        verbose_name_plural = "実績"
