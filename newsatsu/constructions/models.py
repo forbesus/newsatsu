@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from newsatsu.users.models import CompanyModel, UnionModel
+from newsatsu.utils.models import TimeStampModel
 
 
 class ConstructionModel(models.Model):
@@ -58,22 +59,22 @@ class ConstructionModel(models.Model):
 
 class RequestCompanyModel(models.Model):
     class RequestCompanyStatus(models.TextChoices):
-        REQUESTING = _("見積依頼中"), "requesting"
-        REQUEST_ACCEPT = _("見積依頼"), "accept request"
-        REQUEST_DECLINE = _("見積辞退"), "decline request"
-        REQUEST_UNSUCCESSFUL = _("落選"), "unsuccessful"
-        QA = _("質疑応答"), "question and answer"
-        BID = _("入札"), "bidding"
-        HEARING_REQUESTING = _("ヒアリング会への招待中"), "request hearing"
-        HEARING_ACCEPT = _("ヒアリング会承認"), "accept hearing"
-        HEARING_DECLINE = _("ヒアリング会へ拒否"), "accept decline"
-        HIRING = _("採用中"), "hiring"
-        HIRED = _("採用"), "hired"
-        HIRING_UNSUCCESSFUL = _("採用落選"), "unsuccessful hire"
-        FINISHED_WORK = _("作業終了"), "finished work"
-        EVALUATION = _("入評価登録札"), "evaluation"
+        REQUESTING = _("見積依頼中")
+        REQUEST_ACCEPT = _("見積依頼")
+        REQUEST_DECLINE = _("見積辞退")
+        REQUEST_UNSUCCESSFUL = _("落選")
+        QA = _("質疑応答")
+        BID = _("入札")
+        HEARING_REQUESTING = _("ヒアリング会への招待中")
+        HEARING_ACCEPT = _("ヒアリング会承認")
+        HEARING_DECLINE = _("ヒアリング会へ拒否")
+        HIRING = _("採用中")
+        HIRED = _("採用")
+        HIRING_UNSUCCESSFUL = _("採用落選")
+        FINISHED_WORK = _("作業終了")
+        EVALUATION = _("入評価登録札")
 
-    construction = models.ForeignKey(ConstructionModel, on_delete=models.SET_NULL, null=True, blank=True)
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, default=True)
     amount = models.FloatField(default=0)
     message = models.TextField(null=True, blank=True)
@@ -87,3 +88,29 @@ class RequestCompanyModel(models.Model):
     class Meta:
         verbose_name = "見積依頼会社"
         verbose_name_plural = "見積依頼会社"
+
+
+class RequestQuestion(TimeStampModel):
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True)
+    content = models.TextField(_("質問"))
+
+    def __str__(self) -> str:
+        return self.content
+
+    class Meta:
+        verbose_name = "質問"
+        verbose_name_plural = "質問"
+
+
+class RequestAnswer(TimeStampModel):
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+    question = models.CharField(max_length=1024)
+    answer = models.TextField()
+
+    def __str__(self) -> str:
+        return self.question
+
+    class Meta:
+        verbose_name = "応答"
+        verbose_name_plural = "応答"
