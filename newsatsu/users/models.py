@@ -15,9 +15,14 @@ class User(AbstractUser):
     check forms.SignupForm and forms.SocialSignupForms accordingly.
     """
 
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
     class UserTypeModel(models.TextChoices):
-        UNION = _("管理組合"), "union"
-        COMPANY = _("施工会社"), "company"
+        UNION = _("union"), "管理組合"
+        COMPANY = _("company"), "施工会社"
 
     # First and last name do not cover name patterns around the globe
     name = models.CharField(_("会社名"), blank=True, max_length=255)
@@ -42,6 +47,21 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
 
 
 class UnionModel(models.Model):
@@ -75,6 +95,21 @@ class UnionModel(models.Model):
         verbose_name = "管理組合"
         verbose_name_plural = "管理組合"
 
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
+
 
 class CompanyModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -98,11 +133,26 @@ class CompanyModel(models.Model):
         verbose_name = "施工会社"
         verbose_name_plural = "施工会社"
 
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
+
 
 class CompanyAchievementModel(TimeStampModel):
     class AchievementType(models.TextChoices):
-        SUB = _("下請"), "subcontractor"
-        PRIME = _("元請"), "prime contractor"
+        SUB = _("sub_contractor"), "下請"
+        PRIME = _("prime_contractor"), "元請"
 
     company = models.ForeignKey(CompanyModel, on_delete=models.CASCADE)
 
@@ -118,3 +168,18 @@ class CompanyAchievementModel(TimeStampModel):
     class Meta:
         verbose_name = "実績"
         verbose_name_plural = "実績"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True

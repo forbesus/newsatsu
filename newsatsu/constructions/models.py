@@ -7,13 +7,13 @@ from newsatsu.utils.models import TimeStampModel
 
 class ConstructionModel(models.Model):
     class ConstructionStatus(models.TextChoices):
-        REQUEST = _("見積依頼"), "request Quotation"
-        QUESTION = _("質問"), "question"
-        ANSWER = _("応答"), "answer"
-        BID = _("入札"), "bidding"
-        HEARING = _("ヒアリング会"), "hearing party"
-        HIRING = _("採用"), "hiring"
-        EVALUATION = _("入評価登録札"), "evaluation"
+        REQUEST = _("request"), "見積依頼"
+        QUESTION = _("question"), "質問"
+        ANSWER = _("answer"), "応答"
+        BID = _("bidding"), "入札"
+        HEARING = _("hearing"), "ヒアリング会"
+        HIRING = _("hiring"), "採用"
+        EVALUATION = _("evaluation"), "入評価登録札"
 
     union = models.ForeignKey(UnionModel, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(_("工事名"), max_length=255)
@@ -60,10 +60,10 @@ class ConstructionModel(models.Model):
 
 class RequestCompanyModel(models.Model):
     class RequestCompanyStatus(models.TextChoices):
-        REQUESTING = _("見積依頼中")
-        ACCEPT = _("見積依頼")
-        DECLINE = _("見積辞退")
-        REQUEST_UNSUCCESSFUL = _("落選")
+        REQUESTING = _("requesting"), "見積依頼中"
+        ACCEPT = _("accept"), "見積依頼"
+        DECLINE = _("decline"), "見積辞退"
+        REQUEST_UNSUCCESSFUL = _("unsuccessful"), "落選"
 
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
 
@@ -117,9 +117,9 @@ class BidModel(TimeStampModel):
 
 class HearingModel(TimeStampModel):
     class HearingStatus(models.TextChoices):
-        REQUESTING = _("ヒアリング会への招待中")
-        ACCEPT = _("ヒアリング会承認")
-        DECLINE = _("ヒアリング会へ拒否")
+        REQUESTING = _("requesting"), "ヒアリング会への招待中"
+        ACCEPT = _("accept"), "ヒアリング会承認"
+        DECLINE = _("decline"), "ヒアリング会へ拒否"
 
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, blank=True)
@@ -137,12 +137,12 @@ class HearingModel(TimeStampModel):
 
 class HireModel(models.Model):
     class HireStatus(models.TextChoices):
-        REQUESTING = _("採用中")
-        ACCEPT = _("採用承認")
-        DECLINE = _("採用辞退")
-        WORK_UNSUCCESSFUL = _("採用落選")
-        FINISHED_WORK = _("作業終了")
-        EVALUATION = _("入評価登録札")
+        REQUESTING = _("requesting"), "採用中"
+        ACCEPT = _("accept"), "採用承認"
+        DECLINE = _("decline"), "採用辞退"
+        WORK_UNSUCCESSFUL = _("unsuccessful"), "採用落選"
+        FINISHED_WORK = _("finish"), "作業終了"
+        EVALUATION = _("evaluation"), "入評価登録札"
 
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, blank=True)

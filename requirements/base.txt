@@ -21,3 +21,6 @@ djangorestframework==3.14.0  # https://github.com/encode/django-rest-framework
 django-cors-headers==4.2.0  # https://github.com/adamchainz/django-cors-headers
 # DRF-spectacular for api documentation
 drf-spectacular==0.26.4  # https://github.com/tfranzel/drf-spectacular
+# DRY permissions
+dry-rest-permissions=0.1.10 # https://github.com/dbkaplan/dry-rest-permissions.git
+djangorestframework-simplejwt=5.2.2
