@@ -12,17 +12,6 @@ class UserSerializer(serializers.ModelSerializer[UserType]):
         model = User
         fields = ["email", "username", "name", "user_type"]
 
-        extra_kwargs = {
-            "url": {"view_name": "api:user-detail", "lookup_field": "username"},
-        }
-
-
-class CompanySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CompanyModel
-        fields = "__all__"
-        depth = 2
-
 
 class UnionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,3 +24,10 @@ class CompanyAchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyAchievementModel
         fields = "__all__"
+
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyModel
+        fields = "__all__"
+        depth = 2

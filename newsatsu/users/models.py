@@ -21,8 +21,8 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     class UserTypeModel(models.TextChoices):
-        UNION = _("union"), "管理組合"
-        COMPANY = _("company"), "施工会社"
+        UNION = _("unions"), "管理組合"
+        COMPANY = _("companies"), "施工会社"
 
     # First and last name do not cover name patterns around the globe
     name = models.CharField(_("会社名"), blank=True, max_length=255)
@@ -37,7 +37,7 @@ class User(AbstractUser):
     building_name = models.CharField(_("建物名"), max_length=100)
 
     # site url
-    url = models.CharField(_("ホームページ"), max_length=255)
+    url = models.CharField(_("ホームページ"), max_length=255, null=True, blank=True)
 
     def get_absolute_url(self) -> str:
         """Get URL for user's detail view.
@@ -57,7 +57,7 @@ class User(AbstractUser):
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
 
     @staticmethod
     def has_create_permission(request):
@@ -65,13 +65,12 @@ class User(AbstractUser):
 
 
 class UnionModel(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def year_choices():
         return tuple([(r, r) for r in range(1950, datetime.date.today().year + 1)])
 
-    building = models.CharField(_("建物名"), max_length=255)
-    name = models.CharField(_("管理組合名"), max_length=255)
+    name = models.CharField(_("建物名"), max_length=255)
 
     # 規模
     total_units = models.IntegerField(_("総戸数"))
@@ -112,7 +111,7 @@ class UnionModel(models.Model):
 
 
 class CompanyModel(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     # 会社規模
     capital_stock = models.FloatField(_("資本金"))
     sales_amount = models.FloatField(_("売上高"))
@@ -138,7 +137,7 @@ class CompanyModel(models.Model):
         return True
 
     def has_object_read_permission(self, request):
-        return True
+        return request.user.is_staff or self.user == request.user
 
     @staticmethod
     def has_write_permission(request):
@@ -182,4 +181,4 @@ class CompanyAchievementModel(TimeStampModel):
 
     @staticmethod
     def has_create_permission(request):
-        return True
+        return request.user.user_type == "companies"
