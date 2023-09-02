@@ -103,7 +103,7 @@ class UnionModel(models.Model):
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
 
     @staticmethod
     def has_create_permission(request):
@@ -137,11 +137,11 @@ class CompanyModel(models.Model):
         return True
 
     def has_object_read_permission(self, request):
-        return request.user.is_staff or self.user == request.user
+        return self.user == request.user
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
 
     @staticmethod
     def has_create_permission(request):

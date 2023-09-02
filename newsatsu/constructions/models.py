@@ -28,7 +28,7 @@ class ConstructionModel(models.Model):
     not_selected = models.BooleanField(_("指定しない"), default=False)
 
     # スケジュール
-    quotation_request = models.DateField(_("見積もり依頼予定"))
+    question_request = models.DateField(_("見積もり依頼予定"))
     request_QA = models.DateField(_("質疑受付予定"))
     end_QA = models.DateField(_("質疑回答予定"))
     quotation_request = models.DateField(_("見積もり提出締切"))
@@ -51,11 +51,26 @@ class ConstructionModel(models.Model):
             self.first_engineer = False
             self.second_engineer = False
             self.on_site_agent = False
-        self.save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "工事"
         verbose_name_plural = "工事"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
 
 
 class RequestCompanyModel(models.Model):
@@ -66,6 +81,7 @@ class RequestCompanyModel(models.Model):
         REQUEST_UNSUCCESSFUL = _("unsuccessful"), "落選"
 
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True)
 
     status = models.CharField(
         choices=RequestCompanyStatus.choices, default=RequestCompanyStatus.REQUESTING, max_length=20
@@ -75,8 +91,24 @@ class RequestCompanyModel(models.Model):
         return f"{self.company.user.name}"
 
     class Meta:
+        unique_together = ("company", "construction")
         verbose_name = "見積依頼会社"
         verbose_name_plural = "見積依頼会社"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
 
 
 class RequestQuestionModel(TimeStampModel):
@@ -88,12 +120,29 @@ class RequestQuestionModel(TimeStampModel):
         return self.content
 
     class Meta:
+        unique_together = ("company", "construction")
         verbose_name = "質問"
         verbose_name_plural = "質問"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
 
 
 class RequestAnswerModel(TimeStampModel):
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True)
     question = models.CharField(max_length=1024)
     answer = models.TextField()
 
@@ -101,18 +150,51 @@ class RequestAnswerModel(TimeStampModel):
         return self.question
 
     class Meta:
+        unique_together = ("company", "construction")
         verbose_name = "応答"
         verbose_name_plural = "応答"
 
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
+
 
 class BidModel(TimeStampModel):
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.FloatField(default=0)
     message = models.TextField(null=True, blank=True)
 
     class Meta:
+        unique_together = ("company", "construction")
         verbose_name = "入札会社"
         verbose_name_plural = "入札会社"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
 
 
 class HearingModel(TimeStampModel):
@@ -131,8 +213,24 @@ class HearingModel(TimeStampModel):
     contact_number = models.CharField(_("連絡番号"), max_length=30)
 
     class Meta:
+        unique_together = ("company", "construction")
         verbose_name = "ヒアリング会"
         verbose_name_plural = "ヒアリング会"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
 
 
 class HireModel(models.Model):
@@ -150,5 +248,21 @@ class HireModel(models.Model):
     status = models.CharField(choices=HireStatus.choices, default=HireStatus.REQUESTING, max_length=20)
 
     class Meta:
+        unique_together = ("company", "construction")
         verbose_name = "採用"
         verbose_name_plural = "採用"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True

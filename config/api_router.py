@@ -3,6 +3,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
+from newsatsu.constructions.api.views import ConstructionViewSet, RequestCompanyViewSet
 from newsatsu.users.api.views import CompanyAchievementViewSet, CompanyViewSet, UnionViewSet, UserViewSet
 
 if settings.DEBUG:
@@ -14,6 +15,8 @@ router.register("users", UserViewSet)
 router.register("companies", CompanyViewSet)
 router.register("unions", UnionViewSet)
 router.register("achievements", CompanyAchievementViewSet)
+router.register("constructions", ConstructionViewSet)
+router.register("request-companies", RequestCompanyViewSet)
 
 app_name = "api"
 urlpatterns = [

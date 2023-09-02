@@ -29,24 +29,20 @@ class UserViewSet(ModelViewSet):
 
     def create(self, request: Request) -> Response:
         try:
-            serializer = self.get_serializer(
-                data={
-                    "name": request.data["name"],
-                    "email": request.data["email"],
-                    "username": request.data["username"],
-                    "password": request.data["password"],
-                    "area": request.data["area"],
-                    "user_type": request.data["user_type"],
-                    "post_code": request.data["post_code"],
-                    "prefecture": request.data["prefecture"],
-                    "city": request.data["city"],
-                    "house_number": request.data["house_number"],
-                    "building_name": request.data["building_name"],
-                    "url": request.data["url"],
-                }
+            user = User(
+                name=request.data["name"],
+                email=request.data["email"],
+                username=request.data["username"],
+                password=request.data["password"],
+                area=request.data["area"],
+                user_type=request.data["user_type"],
+                post_code=request.data["post_code"],
+                prefecture=request.data["prefecture"],
+                city=request.data["city"],
+                house_number=request.data["house_number"],
+                building_name=request.data["building_name"],
+                url=request.data["url"],
             )
-            serializer.is_valid(raise_exception=True)
-            user = serializer.save()
             user.set_password(request.data["password"])
             user.save()
             if request.data.get("user_type") == "companies":
@@ -59,7 +55,7 @@ class UserViewSet(ModelViewSet):
                     business_condition=request.data["business_condition"],
                 )
                 company.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
             elif request.data.get("user_type") == "unions":
                 company = UnionModel(
                     user=user,
@@ -74,7 +70,7 @@ class UserViewSet(ModelViewSet):
                     estimated_construction_time=request.data["estimated_construction_time"],
                 )
                 company.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
@@ -84,11 +80,27 @@ class CompanyViewSet(ModelViewSet):
     serializer_class = CompanySerializer
     queryset = CompanyModel.objects.all()
 
+    @action(detail=False, methods=["POST"])
+    def get_profile(self, request):
+        try:
+            company = CompanyModel.objects.get(user=request.user)
+            return Response(status=status.HTTP_200_OK, data=CompanySerializer(company).data)
+        except CompanyModel.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED, data="company is not exist")
+
 
 class UnionViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
     serializer_class = UnionSerializer
     queryset = UnionModel.objects.all()
+
+    @action(detail=False, methods=["POST"])
+    def get_profile(self, request):
+        try:
+            union = UnionModel.objects.get(user=request.user)
+            return Response(status=status.HTTP_200_OK, data=UnionSerializer(union).data)
+        except UnionModel.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED, data="company is not exist")
 
 
 class CompanyAchievementViewSet(ModelViewSet):
