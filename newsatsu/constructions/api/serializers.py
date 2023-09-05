@@ -28,6 +28,7 @@ class RequestQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestQuestionModel
         fields = "__all__"
+        depth = 2
 
 
 class RequestAnswerSerializer(serializers.ModelSerializer):

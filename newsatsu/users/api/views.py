@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
 from dry_rest_permissions.generics import DRYPermissions
 from rest_framework import status
 from rest_framework.decorators import action
@@ -41,7 +42,7 @@ class UserViewSet(ModelViewSet):
                 city=request.data["city"],
                 house_number=request.data["house_number"],
                 building_name=request.data["building_name"],
-                url=request.data["url"],
+                url=request.data.get("url", ""),
             )
             user.set_password(request.data["password"])
             user.save()
@@ -79,6 +80,16 @@ class CompanyViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
     serializer_class = CompanySerializer
     queryset = CompanyModel.objects.all()
+
+    filter_backends = [DjangoFilterBackend]
+
+    filterset_fields = {
+        "user__name": ["exact", "in"],
+        "user__area": ["exact"],
+        "capital_stock": ["gte", "lte"],
+        "sales_amount": ["gte", "lte"],
+        "founded_year": ["gte", "lte"],
+    }
 
     @action(detail=False, methods=["POST"])
     def get_profile(self, request):

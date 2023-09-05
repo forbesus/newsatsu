@@ -66,7 +66,7 @@ class ConstructionModel(models.Model):
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
 
     @staticmethod
     def has_create_permission(request):
@@ -100,15 +100,18 @@ class RequestCompanyModel(models.Model):
         return True
 
     def has_object_read_permission(self, request):
-        return True
+        return self.company.user == request.user
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
+
+    def has_object_write_permission(self, request):
+        return request.user == self.company.user
 
     @staticmethod
     def has_create_permission(request):
-        return True
+        return request.user
 
 
 class RequestQuestionModel(TimeStampModel):
@@ -120,7 +123,6 @@ class RequestQuestionModel(TimeStampModel):
         return self.content
 
     class Meta:
-        unique_together = ("company", "construction")
         verbose_name = "質問"
         verbose_name_plural = "質問"
 
@@ -142,7 +144,6 @@ class RequestQuestionModel(TimeStampModel):
 
 class RequestAnswerModel(TimeStampModel):
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
-    company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True)
     question = models.CharField(max_length=1024)
     answer = models.TextField()
 
@@ -150,7 +151,6 @@ class RequestAnswerModel(TimeStampModel):
         return self.question
 
     class Meta:
-        unique_together = ("company", "construction")
         verbose_name = "応答"
         verbose_name_plural = "応答"
 
