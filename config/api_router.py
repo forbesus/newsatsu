@@ -4,7 +4,10 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from newsatsu.constructions.api.views import (
+    BidViewSet,
     ConstructionViewSet,
+    HearingViewSet,
+    HireViewSet,
     RequestAnswerViewSet,
     RequestCompanyViewSet,
     RequestQuestionViewSet,
@@ -24,6 +27,9 @@ router.register("constructions", ConstructionViewSet)
 router.register("request-companies", RequestCompanyViewSet)
 router.register("request-questions", RequestQuestionViewSet)
 router.register("request-answers", RequestAnswerViewSet)
+router.register("request-bidding", BidViewSet)
+router.register("request-hearing", HearingViewSet)
+router.register("request-hiring", HireViewSet)
 
 
 app_name = "api"

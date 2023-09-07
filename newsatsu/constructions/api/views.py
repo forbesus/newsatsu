@@ -127,6 +127,22 @@ class BidViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
     serializer_class = BidSerializer
     queryset = BidModel.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["construction", "company__user__username"]
+
+    def create(self, request: Request) -> Response:
+        try:
+            bid = BidModel(
+                message=request.data["message"],
+                amount=request.data["amount"],
+                construction=ConstructionModel.objects.get(pk=request.data["construction"]),
+                company=CompanyModel.objects.get(user=request.user),
+            )
+            bid.save()
+            return Response(data=BidSerializer(bid).data, status=status.HTTP_201_CREATED)
+
+        except Exception as err:
+            return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
 
 class HearingViewSet(ModelViewSet):
@@ -134,8 +150,26 @@ class HearingViewSet(ModelViewSet):
     serializer_class = HearingSerializer
     queryset = HearingModel.objects.all()
 
+    filter_backends = [DjangoFilterBackend]
+
+    filterset_fields = ["company", "construction", "company__user__username", "status"]
+
+    def create(self, request: Request) -> Response:
+        hearing, created = HearingModel.objects.get_or_create(
+            construction=ConstructionModel.objects.get(pk=request.data["construction"]),
+            company=CompanyModel.objects.get(pk=request.data["company"]),
+            start_time=request.data["start_time"],
+            location=request.data["location"],
+            contact_number=request.data["contact_number"],
+        )
+        hearing.save()
+        return Response(data=HearingSerializer(hearing).data, status=status.HTTP_201_CREATED)
+
 
 class HireViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
     serializer_class = HireSerializer
     queryset = HireModel.objects.all()
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["construction", "company__user__username"]

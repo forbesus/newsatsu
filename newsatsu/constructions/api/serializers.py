@@ -41,12 +41,14 @@ class BidSerializer(serializers.ModelSerializer):
     class Meta:
         model = BidModel
         fields = "__all__"
+        depth = 2
 
 
 class HearingSerializer(serializers.ModelSerializer):
     class Meta:
         model = HearingModel
         fields = "__all__"
+        depth = 2
 
 
 class HireSerializer(serializers.ModelSerializer):

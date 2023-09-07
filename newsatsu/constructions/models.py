@@ -212,6 +212,9 @@ class HearingModel(TimeStampModel):
     start_time = models.DateTimeField(_("開始日"))
     contact_number = models.CharField(_("連絡番号"), max_length=30)
 
+    def __str__(self) -> str:
+        return self.construction.name
+
     class Meta:
         unique_together = ("company", "construction")
         verbose_name = "ヒアリング会"
@@ -226,7 +229,10 @@ class HearingModel(TimeStampModel):
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
+
+    def has_object_write_permission(self, request):
+        return request.user == self.company.user
 
     @staticmethod
     def has_create_permission(request):
@@ -247,6 +253,9 @@ class HireModel(models.Model):
 
     status = models.CharField(choices=HireStatus.choices, default=HireStatus.REQUESTING, max_length=20)
 
+    def __str__(self) -> str:
+        return self.construction.name
+
     class Meta:
         unique_together = ("company", "construction")
         verbose_name = "採用"
@@ -261,7 +270,10 @@ class HireModel(models.Model):
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
+
+    def has_object_update_permission(self, request):
+        return True
 
     @staticmethod
     def has_create_permission(request):
