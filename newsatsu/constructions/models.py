@@ -278,3 +278,42 @@ class HireModel(models.Model):
     @staticmethod
     def has_create_permission(request):
         return True
+
+
+class EvaluationModel(TimeStampModel):
+    company = models.ForeignKey(CompanyModel, null=True, blank=True, on_delete=models.SET_NULL)
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+
+    quality = models.FloatField(_("品質"), null=True, blank=True)
+    correspondence = models.FloatField(_("居住者対応"), null=True, blank=True)
+    safety = models.FloatField(_("安全性"), null=True, blank=True)
+    period = models.FloatField(_("工期"), null=True, blank=True)
+    maintenance = models.FloatField(_("アフターメンテナンス"), null=True, blank=True)
+
+    comment = models.TextField(_("コメント"), null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.company.user.username
+
+    class Meta:
+        unique_together = ("company", "construction")
+        verbose_name = "工事の評価"
+        verbose_name_plural = "工事の評価"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return True
+
+    def has_object_update_permission(self, request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return True

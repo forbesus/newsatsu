@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from newsatsu.constructions.api.views import (
     BidViewSet,
     ConstructionViewSet,
+    EvaluationViewSet,
     HearingViewSet,
     HireViewSet,
     RequestAnswerViewSet,
@@ -30,6 +31,7 @@ router.register("request-answers", RequestAnswerViewSet)
 router.register("request-bidding", BidViewSet)
 router.register("request-hearing", HearingViewSet)
 router.register("request-hiring", HireViewSet)
+router.register("request-evaluation", EvaluationViewSet)
 
 
 app_name = "api"

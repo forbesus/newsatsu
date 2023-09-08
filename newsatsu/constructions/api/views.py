@@ -11,6 +11,7 @@ from rest_framework.viewsets import ModelViewSet
 from newsatsu.constructions.models import (
     BidModel,
     ConstructionModel,
+    EvaluationModel,
     HearingModel,
     HireModel,
     RequestAnswerModel,
@@ -22,6 +23,7 @@ from newsatsu.users.models import CompanyModel, UnionModel
 from .serializers import (
     BidSerializer,
     ConstructionSerializer,
+    EvaluationSerializer,
     HearingSerializer,
     HireSerializer,
     RequestAnswerSerializer,
@@ -173,3 +175,30 @@ class HireViewSet(ModelViewSet):
 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["construction", "company__user__username"]
+
+
+class EvaluationViewSet(ModelViewSet):
+    permission_classes = (DRYPermissions,)
+    serializer_class = EvaluationSerializer
+
+    queryset = EvaluationModel.objects.all()
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["construction", "company__user__username"]
+
+    def create(self, request: Request) -> Response:
+        evaluation, created = EvaluationModel.objects.get_or_create(
+            construction=ConstructionModel.objects.get(pk=request.data["construction"]),
+            company=CompanyModel.objects.get(pk=request.data["company"]),
+        )
+        if created:
+            evaluation.quality = request.data["quality"]
+            evaluation.correspondence = request.data["correspondence"]
+            evaluation.safety = request.data["safety"]
+            evaluation.period = request.data["period"]
+            evaluation.maintenance = request.data["maintenance"]
+            evaluation.comment = request.data["comment"]
+            evaluation.save()
+            return Response(data=EvaluationSerializer(evaluation).data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=EvaluationSerializer(evaluation).data, status=status.HTTP_201_CREATED)

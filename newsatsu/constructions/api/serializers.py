@@ -3,6 +3,7 @@ from rest_framework import serializers
 from newsatsu.constructions.models import (
     BidModel,
     ConstructionModel,
+    EvaluationModel,
     HearingModel,
     HireModel,
     RequestAnswerModel,
@@ -54,4 +55,10 @@ class HearingSerializer(serializers.ModelSerializer):
 class HireSerializer(serializers.ModelSerializer):
     class Meta:
         model = HireModel
+        fields = "__all__"
+
+
+class EvaluationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EvaluationModel
         fields = "__all__"
