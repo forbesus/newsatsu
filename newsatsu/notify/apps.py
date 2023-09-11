@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 class NotifyConfig(AppConfig):
     name = "newsatsu.notify"
-    name = "notify"
     verbose_name = _("notify")
     verbose_name_plural = _("notifies")
 

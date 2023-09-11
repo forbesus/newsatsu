@@ -13,6 +13,7 @@ from newsatsu.constructions.api.views import (
     RequestCompanyViewSet,
     RequestQuestionViewSet,
 )
+from newsatsu.notify.api.views import NotificationViewSet
 from newsatsu.users.api.views import CompanyAchievementViewSet, CompanyViewSet, UnionViewSet, UserViewSet
 
 if settings.DEBUG:
@@ -32,7 +33,7 @@ router.register("request-bidding", BidViewSet)
 router.register("request-hearing", HearingViewSet)
 router.register("request-hiring", HireViewSet)
 router.register("request-evaluation", EvaluationViewSet)
-
+router.register("notifies", NotificationViewSet)
 
 app_name = "api"
 urlpatterns = [
