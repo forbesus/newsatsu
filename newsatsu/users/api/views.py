@@ -64,11 +64,11 @@ class UserViewSet(ModelViewSet):
                     total_units=request.data["total_units"],
                     floor_number=request.data["floor_number"],
                     building_number=request.data["building_number"],
-                    age=request.data["age"],
-                    site_area=request.data["site_area"],
-                    building_area=request.data["building_area"],
-                    total_floor_area=request.data["total_floor_area"],
-                    estimated_construction_time=request.data["estimated_construction_time"],
+                    age=request.data.get("age"),
+                    site_area=request.data.get("site_area"),
+                    building_area=request.data.get("building_area"),
+                    total_floor_area=request.data.get("total_floor_area"),
+                    estimated_construction_time=request.data.get("estimated_construction_time"),
                 )
                 company.save()
                 return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)

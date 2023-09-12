@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
 
@@ -9,6 +10,9 @@ class ContructionsConfig(AppConfig):
 
     def ready(self):
         try:
-            import newsatsu.constructions.signals  # noqa: F401
+            from newsatsu.constructions.models import RequestCompanyModel
+            from newsatsu.constructions.signals import handlers
+
+            post_save.connect(handlers.request_company_event, sender=RequestCompanyModel)
         except ImportError:
             pass

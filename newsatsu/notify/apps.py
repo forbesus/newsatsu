@@ -1,4 +1,6 @@
 from django.apps import AppConfig
+
+# from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
 
@@ -9,6 +11,7 @@ class NotifyConfig(AppConfig):
 
     def ready(self) -> None:
         try:
-            import newsatsu.constructions.signals  # noqa: F401
+            import newsatsu.notify.signals  # noqa: F401
+
         except ImportError:
             pass

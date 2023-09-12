@@ -68,6 +68,9 @@ class ConstructionModel(models.Model):
     def has_write_permission(request):
         return True
 
+    def has_object_update_permission(self, request):
+        return request.user == self.union.user
+
     @staticmethod
     def has_create_permission(request):
         return True

@@ -81,7 +81,7 @@ class RequestCompanyViewSet(ModelViewSet):
     queryset = RequestCompanyModel.objects.all()
     filter_backends = [DjangoFilterBackend]
 
-    filterset_fields = ["company", "construction", "company__user__username"]
+    filterset_fields = ["company", "construction", "company__user__username", "status"]
 
     def create(self, request: Request) -> Response:
         try:

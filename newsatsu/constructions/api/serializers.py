@@ -56,6 +56,7 @@ class HireSerializer(serializers.ModelSerializer):
     class Meta:
         model = HireModel
         fields = "__all__"
+        depth = 2
 
 
 class EvaluationSerializer(serializers.ModelSerializer):
