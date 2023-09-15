@@ -60,7 +60,6 @@ class UserViewSet(ModelViewSet):
             elif request.data.get("user_type") == "unions":
                 company = UnionModel(
                     user=user,
-                    name=request.data["union_name"],
                     total_units=request.data["total_units"],
                     floor_number=request.data["floor_number"],
                     building_number=request.data["building_number"],

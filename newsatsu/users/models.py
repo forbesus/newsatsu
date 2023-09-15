@@ -70,8 +70,6 @@ class UnionModel(models.Model):
     def year_choices():
         return tuple([(r, r) for r in range(1950, datetime.date.today().year + 1)])
 
-    name = models.CharField(_("建物名"), max_length=255)
-
     # 規模
     total_units = models.IntegerField(_("総戸数"))
     floor_number = models.IntegerField(_("階数"))
