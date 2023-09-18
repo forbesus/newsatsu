@@ -79,8 +79,8 @@ class UserViewSet(ModelViewSet):
         try:
             data = request.data
             user = request.user
-            # if "username" in data:
-            #     user.username = data["username"]
+            if "username" in data:
+                user.username = data["username"]
             if "post_code" in data:
                 user.post_code = data["post_code"]
             if "city" in data:
