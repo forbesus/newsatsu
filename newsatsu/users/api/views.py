@@ -79,10 +79,12 @@ class UserViewSet(ModelViewSet):
         try:
             data = request.data
             user = request.user
-            # if "username" in data:
-            #     user.username = data["username"]
+            if "username" in data:
+                user.username = data["username"]
             if "post_code" in data:
                 user.post_code = data["post_code"]
+            if "prefecture" in data:
+                user.prefecture = data["prefecture"]
             if "city" in data:
                 user.city = data["city"]
             if "house_number" in data:
@@ -96,9 +98,25 @@ class UserViewSet(ModelViewSet):
                 union = UnionModel.objects.get(user=user)
                 if "estimated_construction_time" in data:
                     union.estimated_construction_time = data["estimated_construction_time"]
-                    union.save()
+                union.save()
                 return Response(data=UnionSerializer(union).data, status=status.HTTP_206_PARTIAL_CONTENT)
-
+            elif request.data.get("user_type") == "companies":
+                if "area" in data:
+                    user.area = data["area"]
+                    user.save()
+                company = CompanyModel.objects.get(user=user)
+                if "capital_stock" in data:
+                    company.capital_stock = data["capital_stock"]
+                if "sales_amount" in data:
+                    company.sales_amount = data["sales_amount"]
+                if "employee_number" in data:
+                    company.employee_number = data["employee_number"]
+                if "founded_year" in data:
+                    company.founded_year = data["founded_year"]
+                if "business_condition" in data:
+                    company.business_condition = data["business_condition"]
+                company.save()
+                return Response(data=CompanySerializer(company).data, status=status.HTTP_206_PARTIAL_CONTENT)
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
