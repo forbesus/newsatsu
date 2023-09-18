@@ -59,6 +59,9 @@ class User(AbstractUser):
     def has_write_permission(request):
         return True
 
+    def has_object_update_permission(self, request):
+        return self == request.user
+
     @staticmethod
     def has_create_permission(request):
         return True

@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
@@ -71,6 +72,33 @@ class UserViewSet(ModelViewSet):
                 )
                 company.save()
                 return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        except Exception as err:
+            return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        try:
+            data = request.data
+            user = request.user
+            # if "username" in data:
+            #     user.username = data["username"]
+            if "post_code" in data:
+                user.post_code = data["post_code"]
+            if "city" in data:
+                user.city = data["city"]
+            if "house_number" in data:
+                user.house_number = data["house_number"]
+            if "building_name" in data:
+                user.building_name = data["building_name"]
+            if "url" in data:
+                user.url = data["url"]
+            user.save()
+            if request.data.get("user_type") == "unions":
+                union = UnionModel.objects.get(user=user)
+                if "estimated_construction_time" in data:
+                    union.estimated_construction_time = data["estimated_construction_time"]
+                    union.save()
+                return Response(data=UnionSerializer(union).data, status=status.HTTP_206_PARTIAL_CONTENT)
+
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
