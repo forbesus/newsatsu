@@ -10,9 +10,15 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from newsatsu.users.models import CompanyAchievementModel, CompanyModel, UnionModel
+from newsatsu.users.models import CompanyAchievementModel, CompanyModel, CompanyOverviewModel, UnionModel
 
-from .serializers import CompanyAchievementSerializer, CompanySerializer, UnionSerializer, UserSerializer
+from .serializers import (
+    CompanyAchievementSerializer,
+    CompanyOverviewSerializer,
+    CompanySerializer,
+    UnionSerializer,
+    UserSerializer,
+)
 
 User = get_user_model()
 
@@ -164,8 +170,37 @@ class CompanyAchievementViewSet(ModelViewSet):
     serializer_class = CompanyAchievementSerializer
     queryset = CompanyAchievementModel.objects.all()
 
-    def get_queryset(self, queryset, request):
-        return queryset.filter(company__user=request.user)
+    def create(
+        self,
+        request: Request,
+    ) -> Response:
+        try:
+            data = request.data
+            achieve = CompanyAchievementModel(
+                user=request.user,
+                type=data["type"],
+                title=data["title"],
+                counter=data["counter"],
+                price=data["price"],
+            )
+            achieve.save()
+            return Response(data=CompanyAchievementSerializer(achieve).data, status=status.HTTP_201_CREATED)
+        except Exception as err:
+            return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["GET"])
+    def get_achieve(self, request):
+        achieves = CompanyAchievementModel.objects.filter(user=request.user)
+        return Response(data=CompanyAchievementSerializer(achieves, many=True).data, status=status.HTTP_200_OK)
+
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        return super().list(request, *args, **kwargs)
+
+
+class CompanyOverviewViewSet(ModelViewSet):
+    permission_classes = (DRYPermissions,)
+    serializer_class = CompanyOverviewSerializer
+    queryset = CompanyOverviewModel.objects.all()
 
     def create(
         self,
@@ -173,15 +208,25 @@ class CompanyAchievementViewSet(ModelViewSet):
     ) -> Response:
         try:
             data = request.data
-            company = CompanyModel.objects.get(user=request.user)
-            achieve = CompanyAchievementModel(
-                company=company,
-                type=data["type"],
-                title=data["title"],
-                content=data["content"],
-                price=data["price"],
+            overview = CompanyOverviewModel(
+                user=request.user,
+                pr_text=data["pr_text"],
             )
-            achieve.save()
-            return Response(data=CompanyAchievementSerializer(achieve).data, status=status.HTTP_201_CREATED)
+            overview.save()
+            return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_201_CREATED)
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["GET"])
+    def get_overview(self, request):
+        overview, created = CompanyOverviewModel.objects.get_or_create(user=request.user)
+        return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_200_OK)
+
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        data = request.data
+        user = request.user
+        overview = CompanyOverviewModel.objects.get(user=user)
+        overview.pr_text = data["pr_text"]
+        overview.save()
+
+        return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_206_PARTIAL_CONTENT)

@@ -154,13 +154,14 @@ class CompanyAchievementModel(TimeStampModel):
         SUB = _("sub_contractor"), "下請"
         PRIME = _("prime_contractor"), "元請"
 
-    company = models.ForeignKey(CompanyModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     type = models.CharField(choices=AchievementType.choices, max_length=20)
     title = models.CharField(max_length=512)
-    content = models.TextField()
 
     price = models.FloatField()
+
+    counter = models.IntegerField(default=0)
 
     def __str__(self) -> str:
         return self.title
@@ -178,7 +179,36 @@ class CompanyAchievementModel(TimeStampModel):
 
     @staticmethod
     def has_write_permission(request):
-        return False
+        return True
+
+    def has_object_destroy_permission(self, request):
+        return self.user == request.user
+
+    @staticmethod
+    def has_create_permission(request):
+        return request.user.user_type == "companies"
+
+
+class CompanyOverviewModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pr_text = models.TextField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.user.username
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return True
+
+    def has_object_update_permission(self, request):
+        return self.user == request.user
 
     @staticmethod
     def has_create_permission(request):

@@ -63,3 +63,4 @@ class EvaluationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EvaluationModel
         fields = "__all__"
+        depth = 2

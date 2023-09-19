@@ -176,6 +176,14 @@ class HireViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["construction", "company__user__username"]
 
+    def create(self, request: Request) -> Response:
+        hiring, created = HireModel.objects.get_or_create(
+            construction=ConstructionModel.objects.get(pk=request.data["construction"]),
+            company=CompanyModel.objects.get(pk=request.data["company"]),
+        )
+        hiring.save()
+        return Response(data=HireSerializer(hiring).data, status=status.HTTP_201_CREATED)
+
 
 class EvaluationViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)

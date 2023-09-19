@@ -14,7 +14,13 @@ from newsatsu.constructions.api.views import (
     RequestQuestionViewSet,
 )
 from newsatsu.notify.api.views import NotificationViewSet
-from newsatsu.users.api.views import CompanyAchievementViewSet, CompanyViewSet, UnionViewSet, UserViewSet
+from newsatsu.users.api.views import (
+    CompanyAchievementViewSet,
+    CompanyOverviewViewSet,
+    CompanyViewSet,
+    UnionViewSet,
+    UserViewSet,
+)
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -34,6 +40,8 @@ router.register("request-hearing", HearingViewSet)
 router.register("request-hiring", HireViewSet)
 router.register("request-evaluation", EvaluationViewSet)
 router.register("notifies", NotificationViewSet)
+router.register("overviews", CompanyOverviewViewSet)
+
 
 app_name = "api"
 urlpatterns = [
