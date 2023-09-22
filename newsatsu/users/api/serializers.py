@@ -3,11 +3,23 @@ from rest_framework import serializers
 
 from newsatsu.users.models import CompanyAchievementModel, CompanyModel, CompanyOverviewModel, UnionModel
 from newsatsu.users.models import User as UserType
+from newsatsu.users.models import UserFileModel
 
 User = get_user_model()
 
 
+class UserFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFileModel
+        fields = ["file"]
+
+
 class UserSerializer(serializers.ModelSerializer[UserType]):
+    files = serializers.SerializerMethodField()
+
+    def get_files(self, obj):
+        return UserFileSerializer(UserFileModel.objects.filter(user=obj), many=True).data
+
     class Meta:
         model = User
         exclude = ["id", "password", "groups", "user_permissions", "is_staff", "first_name", "last_name"]

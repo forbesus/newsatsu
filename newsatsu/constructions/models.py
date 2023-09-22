@@ -117,13 +117,14 @@ class RequestCompanyModel(models.Model):
         return request.user
 
 
-class RequestQuestionModel(TimeStampModel):
+class RequestQAModel(TimeStampModel):
     construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyModel, on_delete=models.SET_NULL, null=True)
-    content = models.TextField(_("質問"))
+    question = models.TextField(_("質問"))
+    answer = models.TextField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return self.content
+        return self.question
 
     class Meta:
         verbose_name = "質問"
@@ -138,35 +139,10 @@ class RequestQuestionModel(TimeStampModel):
 
     @staticmethod
     def has_write_permission(request):
-        return False
-
-    @staticmethod
-    def has_create_permission(request):
         return True
 
-
-class RequestAnswerModel(TimeStampModel):
-    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
-    question = models.CharField(max_length=1024)
-    answer = models.TextField()
-
-    def __str__(self) -> str:
-        return self.question
-
-    class Meta:
-        verbose_name = "応答"
-        verbose_name_plural = "応答"
-
-    @staticmethod
-    def has_read_permission(request):
-        return True
-
-    def has_object_read_permission(self, request):
-        return True
-
-    @staticmethod
-    def has_write_permission(request):
-        return False
+    def has_object_update_permission(self, request):
+        return self.construction.user == request.user
 
     @staticmethod
     def has_create_permission(request):

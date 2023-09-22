@@ -213,3 +213,15 @@ class CompanyOverviewModel(models.Model):
     @staticmethod
     def has_create_permission(request):
         return request.user.user_type == "companies"
+
+
+def user_file_upload_directory_path(instance, filename):
+    return f"users/{instance.user.username}/{filename}"
+
+
+class UserFileModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=user_file_upload_directory_path)
+
+    def __str__(self) -> str:
+        return self.user.username

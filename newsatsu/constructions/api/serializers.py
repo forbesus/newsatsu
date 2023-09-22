@@ -6,9 +6,8 @@ from newsatsu.constructions.models import (
     EvaluationModel,
     HearingModel,
     HireModel,
-    RequestAnswerModel,
     RequestCompanyModel,
-    RequestQuestionModel,
+    RequestQAModel,
 )
 from newsatsu.users.api.serializers import CompanySerializer, UnionSerializer
 
@@ -39,7 +38,7 @@ class RequestCompanySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class RequestQuestionSerializer(serializers.ModelSerializer):
+class RequestQASerializer(serializers.ModelSerializer):
     construction = serializers.SerializerMethodField()
     company = serializers.SerializerMethodField()
 
@@ -50,22 +49,7 @@ class RequestQuestionSerializer(serializers.ModelSerializer):
         return CompanySerializer(obj.company).data
 
     class Meta:
-        model = RequestQuestionModel
-        fields = "__all__"
-
-
-class RequestAnswerSerializer(serializers.ModelSerializer):
-    construction = serializers.SerializerMethodField()
-    company = serializers.SerializerMethodField()
-
-    def get_construction(self, obj):
-        return ConstructionSerializer(obj.construction).data
-
-    def get_company(self, obj):
-        return CompanySerializer(obj.company).data
-
-    class Meta:
-        model = RequestAnswerModel
+        model = RequestQAModel
         fields = "__all__"
 
 

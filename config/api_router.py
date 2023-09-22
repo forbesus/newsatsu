@@ -9,9 +9,8 @@ from newsatsu.constructions.api.views import (
     EvaluationViewSet,
     HearingViewSet,
     HireViewSet,
-    RequestAnswerViewSet,
     RequestCompanyViewSet,
-    RequestQuestionViewSet,
+    RequestQAViewSet,
 )
 from newsatsu.notify.api.views import NotificationViewSet
 from newsatsu.users.api.views import (
@@ -33,8 +32,7 @@ router.register("unions", UnionViewSet)
 router.register("achievements", CompanyAchievementViewSet)
 router.register("constructions", ConstructionViewSet)
 router.register("request-companies", RequestCompanyViewSet)
-router.register("request-questions", RequestQuestionViewSet)
-router.register("request-answers", RequestAnswerViewSet)
+router.register("request-qa", RequestQAViewSet)
 router.register("request-bidding", BidViewSet)
 router.register("request-hearing", HearingViewSet)
 router.register("request-hiring", HireViewSet)
