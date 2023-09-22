@@ -10,32 +10,48 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer[UserType]):
     class Meta:
         model = User
-        fields = ["email", "username", "name", "user_type"]
+        exclude = ["id", "password", "groups", "user_permissions", "is_staff", "first_name", "last_name"]
 
 
 class UnionSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
     class Meta:
         model = UnionModel
         fields = "__all__"
-        depth = 2
 
 
 class CompanyAchievementSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
     class Meta:
         model = CompanyAchievementModel
         fields = "__all__"
-        depth = 2
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
     class Meta:
         model = CompanyModel
         fields = "__all__"
-        depth = 2
 
 
 class CompanyOverviewSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
     class Meta:
         model = CompanyOverviewModel
         fields = "__all__"
-        depth = 2
