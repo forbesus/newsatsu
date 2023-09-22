@@ -189,9 +189,14 @@ class CompanyAchievementModel(TimeStampModel):
         return request.user.user_type == "companies"
 
 
+def pr_file_upload_directory_path(instance, filename):
+    return f"prs/{instance.user.username}/{filename}"
+
+
 class CompanyOverviewModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pr_text = models.TextField(null=True, blank=True)
+    pr_image = models.FileField(upload_to=pr_file_upload_directory_path, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.user.username
