@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
 from newsatsu.constructions.models import (
+    BidFileModel,
     BidModel,
+    ConstructionFileModel,
     ConstructionModel,
     EvaluationModel,
     HearingModel,
@@ -12,11 +14,22 @@ from newsatsu.constructions.models import (
 from newsatsu.users.api.serializers import CompanySerializer, UnionSerializer
 
 
+class ConstructionFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConstructionFileModel
+        fields = ["file"]
+
+
 class ConstructionSerializer(serializers.ModelSerializer):
     union = serializers.SerializerMethodField()
 
     def get_union(self, obj):
         return UnionSerializer(obj.union).data
+
+    files = serializers.SerializerMethodField()
+
+    def get_files(self, obj):
+        return ConstructionFileSerializer(ConstructionFileModel.objects.filter(construction=obj), many=True).data
 
     class Meta:
         model = ConstructionModel
@@ -53,15 +66,25 @@ class RequestQASerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class BidFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BidFileModel
+        fields = ["file"]
+
+
 class BidSerializer(serializers.ModelSerializer):
     construction = serializers.SerializerMethodField()
     company = serializers.SerializerMethodField()
+    files = serializers.SerializerMethodField()
 
     def get_construction(self, obj):
         return ConstructionSerializer(obj.construction).data
 
     def get_company(self, obj):
         return CompanySerializer(obj.company).data
+
+    def get_files(self, obj):
+        return BidFileSerializer(BidFileModel.objects.filter(bid=obj), many=True).data
 
     class Meta:
         model = BidModel

@@ -76,6 +76,18 @@ class ConstructionModel(models.Model):
         return True
 
 
+def construction_file_upload_directory_path(instance, filename):
+    return f"constructions/{instance.construction.name}/{filename}"
+
+
+class ConstructionFileModel(models.Model):
+    construction = models.ForeignKey(ConstructionModel, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=construction_file_upload_directory_path)
+
+    def __str__(self) -> str:
+        return self.construction.name
+
+
 class RequestCompanyModel(models.Model):
     class RequestCompanyStatus(models.TextChoices):
         REQUESTING = _("requesting"), "見積依頼中"
@@ -174,6 +186,15 @@ class BidModel(TimeStampModel):
     @staticmethod
     def has_create_permission(request):
         return True
+
+
+def bid_file_upload_directory_path(instance, filename):
+    return f"bids/{instance.construction.name}/{instance.company.user.username}/{filename}"
+
+
+class BidFileModel(TimeStampModel):
+    bid = models.ForeignKey(BidModel, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=bid_file_upload_directory_path)
 
 
 class HearingModel(TimeStampModel):
