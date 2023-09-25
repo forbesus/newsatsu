@@ -4,12 +4,15 @@ from datetime import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from dry_rest_permissions.generics import DRYPermissions
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from newsatsu.constructions.models import (
+    BidFileModel,
     BidModel,
+    ConstructionFileModel,
     ConstructionModel,
     EvaluationModel,
     HearingModel,
@@ -47,27 +50,32 @@ class ConstructionViewSet(ModelViewSet):
             date_obj = datetime.strptime(request.data.get("endTime"), "%Y-%m")
             end_time = date_obj.strftime("%Y-%m-%d")
 
-            contruction = ConstructionModel(
+            construction = ConstructionModel(
                 union=union,
                 name=request.data.get("name"),
                 content=request.data.get("content"),
                 start_time=start_time,
                 end_time=end_time,
-                first_engineer=request.data.get("firstEngineer"),
-                second_engineer=request.data.get("secondEngineer"),
-                on_site_agent=request.data.get("onSiteAgent"),
-                not_selected=request.data.get("notSelected"),
+                first_engineer=True if request.data.get("firstEngineer") == "true" else False,
+                second_engineer=True if request.data.get("secondEngineer") == "true" else False,
+                on_site_agent=True if request.data.get("onSiteAgent") == "true" else False,
+                not_selected=True if request.data.get("notSelected") == "true" else False,
                 question_request=request.data.get("questionRequest"),
                 request_QA=request.data.get("requestQA"),
                 end_QA=request.data.get("endQA"),
                 quotation_request=request.data.get("quotationRequest"),
                 company_request_number=request.data.get("requestNumber"),
                 submit_document=request.data.get("submitDocument"),
-                site_insurance=request.data.get("siteInsurance"),
-                guarantee_insurance=request.data.get("guaranteeInsurance"),
+                site_insurance=True if request.data.get("siteInsurance") == "true" else False,
+                guarantee_insurance=True if request.data.get("guaranteeInsurance") == "true" else False,
             )
-            contruction.save()
-            return Response(data=ConstructionSerializer(contruction).data, status=status.HTTP_201_CREATED)
+            construction.save()
+
+            for key in request.data.keys():
+                if key.startswith("file_"):
+                    file = ConstructionFileModel(construction=construction, file=request.data[key])
+                    file.save()
+            return Response(data=ConstructionSerializer(construction).data, status=status.HTTP_201_CREATED)
 
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
@@ -107,10 +115,27 @@ class RequestQAViewSet(ModelViewSet):
             company = CompanyModel.objects.get(user=request.user)
             construction = ConstructionModel.objects.get(pk=request.data["construction"])
             request_question = RequestQAModel(
-                content=request.data["content"], company=company, construction=construction
+                question=request.data["question"], company=company, construction=construction
             )
             request_question.save()
-            return Response(data=RequestQAModel(request_question).data, status=status.HTTP_201_CREATED)
+            return Response(data=RequestQASerializer(request_question).data, status=status.HTTP_201_CREATED)
+        except Exception as err:
+            return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["POST"])
+    def csv_upload(self, request):
+        try:
+            answer_list = request.data["answers"]
+            construction = ConstructionModel.objects.get(pk=request.data["construction"])
+            for answer in answer_list:
+                if answer["id"]:
+                    request_qa = RequestQAModel.objects.get(pk=answer["id"], construction=construction)
+                    request_qa.answer = answer["answer"]
+                    request_qa.save()
+            return Response(
+                data=RequestQASerializer(RequestQAModel.objects.filter(construction=construction), many=True).data,
+                status=status.HTTP_202_ACCEPTED,
+            )
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
@@ -131,6 +156,8 @@ class BidViewSet(ModelViewSet):
                 company=CompanyModel.objects.get(user=request.user),
             )
             bid.save()
+            bid_file = BidFileModel(bid=bid, file=request.data["file"])
+            bid_file.save()
             return Response(data=BidSerializer(bid).data, status=status.HTTP_201_CREATED)
 
         except Exception as err:
