@@ -47,7 +47,7 @@ class ConstructionViewSet(ModelViewSet):
             date_obj = datetime.strptime(request.data.get("endTime"), "%Y-%m")
             end_time = date_obj.strftime("%Y-%m-%d")
 
-            contruction = ConstructionModel(
+            construction = ConstructionModel(
                 union=union,
                 name=request.data.get("name"),
                 content=request.data.get("content"),
@@ -66,11 +66,44 @@ class ConstructionViewSet(ModelViewSet):
                 site_insurance=request.data.get("siteInsurance"),
                 guarantee_insurance=request.data.get("guaranteeInsurance"),
             )
-            contruction.save()
-            return Response(data=ConstructionSerializer(contruction).data, status=status.HTTP_201_CREATED)
+            construction.save()
+            return Response(data=ConstructionSerializer(construction).data, status=status.HTTP_201_CREATED)
 
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request: Request) -> Response:
+        instance = self.get_object()
+        data = request.data
+        if "status" in data:
+            update_status = request.data["status"]
+            if update_status == "question":
+                if instance.status == "request":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "answer":
+                if instance.status == "question":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "bidding":
+                if instance.status == "answer":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "hearing":
+                if instance.status == "bidding":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "hiring":
+                if instance.status == "hearing":
+                    instance.status = update_status
+                    instance.save()
+
+            elif update_status == "evaluation":
+                if instance.status == "hiring":
+                    instance.status = update_status
+                    instance.save()
+
+        return Response(data=ConstructionSerializer(instance).data, status=status.HTTP_201_CREATED)
 
 
 class RequestCompanyViewSet(ModelViewSet):
