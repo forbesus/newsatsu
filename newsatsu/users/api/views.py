@@ -10,7 +10,13 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from newsatsu.users.models import CompanyAchievementModel, CompanyModel, CompanyOverviewModel, UnionModel
+from newsatsu.users.models import (
+    CompanyAchievementModel,
+    CompanyModel,
+    CompanyOverviewModel,
+    UnionModel,
+    UserFileModel,
+)
 
 from .serializers import (
     CompanyAchievementSerializer,
@@ -53,6 +59,12 @@ class UserViewSet(ModelViewSet):
             )
             user.set_password(request.data["password"])
             user.save()
+
+            for key in request.data.keys():
+                if key.startswith("file_"):
+                    user_file = UserFileModel(user=user, file=request.data[key])
+                    user_file.save()
+
             if request.data.get("user_type") == "companies":
                 company = CompanyModel(
                     user=user,
@@ -60,7 +72,7 @@ class UserViewSet(ModelViewSet):
                     sales_amount=request.data["sales_amount"],
                     employee_number=request.data["employee_number"],
                     founded_year=request.data["founded_year"],
-                    business_condition=request.data["business_condition"],
+                    business_condition=bool(request.data["business_condition"]),
                 )
                 company.save()
                 return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
@@ -120,7 +132,7 @@ class UserViewSet(ModelViewSet):
                 if "founded_year" in data:
                     company.founded_year = data["founded_year"]
                 if "business_condition" in data:
-                    company.business_condition = data["business_condition"]
+                    company.business_condition = bool(data["business_condition"])
                 company.save()
                 return Response(data=CompanySerializer(company).data, status=status.HTTP_206_PARTIAL_CONTENT)
         except Exception as err:

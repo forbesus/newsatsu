@@ -14,9 +14,8 @@ from newsatsu.constructions.models import (
     EvaluationModel,
     HearingModel,
     HireModel,
-    RequestAnswerModel,
     RequestCompanyModel,
-    RequestQuestionModel,
+    RequestQAModel,
 )
 from newsatsu.users.models import CompanyModel, UnionModel
 
@@ -26,9 +25,8 @@ from .serializers import (
     EvaluationSerializer,
     HearingSerializer,
     HireSerializer,
-    RequestAnswerSerializer,
     RequestCompanySerializer,
-    RequestQuestionSerializer,
+    RequestQASerializer,
 )
 
 
@@ -96,10 +94,10 @@ class RequestCompanyViewSet(ModelViewSet):
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
 
-class RequestQuestionViewSet(ModelViewSet):
+class RequestQAViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
-    serializer_class = RequestQuestionSerializer
-    queryset = RequestQuestionModel.objects.all()
+    serializer_class = RequestQASerializer
+    queryset = RequestQAModel.objects.all()
 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["construction"]
@@ -108,21 +106,13 @@ class RequestQuestionViewSet(ModelViewSet):
         try:
             company = CompanyModel.objects.get(user=request.user)
             construction = ConstructionModel.objects.get(pk=request.data["construction"])
-            request_question = RequestQuestionModel(
+            request_question = RequestQAModel(
                 content=request.data["content"], company=company, construction=construction
             )
             request_question.save()
-            return Response(data=RequestQuestionSerializer(request_question).data, status=status.HTTP_201_CREATED)
+            return Response(data=RequestQAModel(request_question).data, status=status.HTTP_201_CREATED)
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
-
-
-class RequestAnswerViewSet(ModelViewSet):
-    permission_classes = (DRYPermissions,)
-    serializer_class = RequestAnswerSerializer
-    queryset = RequestAnswerModel.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["construction"]
 
 
 class BidViewSet(ModelViewSet):
