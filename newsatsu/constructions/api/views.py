@@ -75,10 +75,44 @@ class ConstructionViewSet(ModelViewSet):
                 if key.startswith("file_"):
                     file = ConstructionFileModel(construction=construction, file=request.data[key])
                     file.save()
+
             return Response(data=ConstructionSerializer(construction).data, status=status.HTTP_201_CREATED)
 
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request: Request) -> Response:
+        instance = self.get_object()
+        data = request.data
+        if "status" in data:
+            update_status = request.data["status"]
+            if update_status == "question":
+                if instance.status == "request":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "answer":
+                if instance.status == "question":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "bidding":
+                if instance.status == "answer":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "hearing":
+                if instance.status == "bidding":
+                    instance.status = update_status
+                    instance.save()
+            elif update_status == "hiring":
+                if instance.status == "hearing":
+                    instance.status = update_status
+                    instance.save()
+
+            elif update_status == "evaluation":
+                if instance.status == "hiring":
+                    instance.status = update_status
+                    instance.save()
+
+        return Response(data=ConstructionSerializer(instance).data, status=status.HTTP_201_CREATED)
 
 
 class RequestCompanyViewSet(ModelViewSet):

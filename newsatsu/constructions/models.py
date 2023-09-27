@@ -13,7 +13,7 @@ class ConstructionModel(models.Model):
         BID = _("bidding"), "入札"
         HEARING = _("hearing"), "ヒアリング会"
         HIRING = _("hiring"), "採用"
-        EVALUATION = _("evaluation"), "入評価登録札"
+        EVALUATION = _("evaluation"), "工事の評価"
 
     union = models.ForeignKey(UnionModel, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(_("工事名"), max_length=255)
