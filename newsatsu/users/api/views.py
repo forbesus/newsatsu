@@ -132,7 +132,7 @@ class UserViewSet(ModelViewSet):
                 if "founded_year" in data:
                     company.founded_year = data["founded_year"]
                 if "business_condition" in data:
-                    company.business_condition = bool(data["business_condition"])
+                    company.business_condition = True if data["business_condition"] == "1" else False
                 company.save()
                 return Response(data=CompanySerializer(company).data, status=status.HTTP_206_PARTIAL_CONTENT)
         except Exception as err:
@@ -235,10 +235,14 @@ class CompanyOverviewViewSet(ModelViewSet):
         return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_200_OK)
 
     def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        data = request.data
-        user = request.user
-        overview = CompanyOverviewModel.objects.get(user=user)
-        overview.pr_text = data["pr_text"]
-        overview.save()
+        try:
+            data = request.data
+            user = request.user
+            overview = CompanyOverviewModel.objects.get(user=user)
+            overview.pr_text = data["pr_text"]
+            overview.pr_image = data["pr_image"]
+            overview.save()
 
-        return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_206_PARTIAL_CONTENT)
+            return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_206_PARTIAL_CONTENT)
+        except Exception as err:
+            return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)

@@ -154,7 +154,7 @@ class RequestQAModel(TimeStampModel):
         return True
 
     def has_object_update_permission(self, request):
-        return self.construction.user == request.user
+        return self.construction.union.user == request.user
 
     @staticmethod
     def has_create_permission(request):
@@ -189,7 +189,7 @@ class BidModel(TimeStampModel):
 
 
 def bid_file_upload_directory_path(instance, filename):
-    return f"bids/{instance.construction.name}/{instance.company.user.username}/{filename}"
+    return f"bids/{instance.bid.construction.name}/{instance.bid.company.user.username}/{filename}"
 
 
 class BidFileModel(TimeStampModel):
