@@ -12,7 +12,7 @@ class NotificationModel(TimeStampModel):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=500)
     content = models.TextField()
-    notify_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    notify_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,related_name='+')
     notify_id = models.PositiveIntegerField()
     notify = GenericForeignKey("notify_type", "notify_id")
     on_mail = models.BooleanField(default=False)

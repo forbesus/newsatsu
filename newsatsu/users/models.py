@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
@@ -86,7 +87,11 @@ class UnionModel(models.Model):
     total_floor_area = models.FloatField(_("延床面積"), null=True, blank=True)
 
     # date time
-    estimated_construction_time = models.DateField(_("想定工事時期"), null=True, blank=True)
+    year_month_regex = RegexValidator(
+        regex=r'^\d{4}-\d{2}$',
+        message="Year-month must be in the format 'YYYY-MM'"
+    )
+    estimated_construction_time = models.CharField(_("想定工事時期"), null=True, blank=True, max_length=7, validators=[year_month_regex])
 
     def __str__(self) -> str:
         return self.user.name
