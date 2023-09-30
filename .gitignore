@@ -278,4 +278,3 @@ newsatsu/media/
 .ipython/
 .env
 .envs/*
-!.envs/.local/
