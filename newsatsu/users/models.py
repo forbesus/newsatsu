@@ -230,3 +230,11 @@ class UserFileModel(models.Model):
 
     def __str__(self) -> str:
         return self.user.username
+
+
+class UserTokenModel(TimeStampModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return self.user.username

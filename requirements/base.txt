@@ -26,3 +26,6 @@ dry-rest-permissions==0.1.10 # https://github.com/dbkaplan/dry-rest-permissions.
 djangorestframework-simplejwt==5.2.2
 
 django-filter==23.2
+
+
+sendgrid==6.10.0

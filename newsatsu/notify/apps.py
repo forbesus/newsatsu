@@ -1,7 +1,10 @@
 from django.apps import AppConfig
+from django.db.models.signals import post_migrate, post_save
 
 # from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
+
+from newsatsu.utils.helpers.func_helpers import func_nothrow
 
 
 class NotifyConfig(AppConfig):
@@ -10,8 +13,11 @@ class NotifyConfig(AppConfig):
     verbose_name_plural = _("notifies")
 
     def ready(self) -> None:
-        try:
-            import newsatsu.notify.signals  # noqa: F401
+        from newsatsu.notify.models import MailTypeModel
+        from newsatsu.notify.signals import handlers
 
-        except ImportError:
-            pass
+        post_migrate.connect(MailTypeModel.create_default_types)
+
+        post_save.connect(func_nothrow(handlers.handle_company_register_event), sender="users.CompanyModel")
+
+        post_save.connect(func_nothrow(handlers.handle_union_register_event), sender="users.UnionModel")
