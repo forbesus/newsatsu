@@ -16,6 +16,7 @@ from newsatsu.users.models import (
     CompanyOverviewModel,
     UnionModel,
     UserFileModel,
+    UserTokenModel
 )
 
 from .serializers import (
@@ -24,6 +25,7 @@ from .serializers import (
     CompanySerializer,
     UnionSerializer,
     UserSerializer,
+    UserTokenSerializer
 )
 
 User = get_user_model()
@@ -137,7 +139,21 @@ class UserViewSet(ModelViewSet):
                 return Response(data=CompanySerializer(company).data, status=status.HTTP_206_PARTIAL_CONTENT)
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=["POST"])
+    def resend_verify(self, request: Request):
+        try:
+            email = request.data["email"]
+            if(email):
+                user = User.objects.get(email=email)
+                user_token = UserTokenModel(user=user)
+                user_token.save()
+                return Response(data=UserTokenSerializer(user_token).data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
 
+                
 
 class CompanyViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
