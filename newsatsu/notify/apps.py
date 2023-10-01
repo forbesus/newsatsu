@@ -13,7 +13,7 @@ class NotifyConfig(AppConfig):
     verbose_name_plural = _("notifies")
 
     def ready(self) -> None:
-        from newsatsu.notify.models import MailTypeModel
+        from newsatsu.notify.models import MailTypeModel, NotificationModel
         from newsatsu.notify.signals import handlers
 
         post_migrate.connect(MailTypeModel.create_default_types)
@@ -21,3 +21,7 @@ class NotifyConfig(AppConfig):
         post_save.connect(func_nothrow(handlers.handle_company_register_event), sender="users.CompanyModel")
 
         post_save.connect(func_nothrow(handlers.handle_union_register_event), sender="users.UnionModel")
+
+        post_save.connect(func_nothrow(handlers.handle_send_mail_event), sender=NotificationModel)
+
+        post_save.connect(func_nothrow(handlers.handle_register_user_token_event), sender="users.UserTokenModel")

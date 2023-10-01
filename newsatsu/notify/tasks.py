@@ -6,6 +6,7 @@ from django.db.models import Case, When
 
 from config import celery_app
 
+from .api.serializers import NotificationSerializer
 from .models import NotificationModel
 
 
@@ -30,6 +31,7 @@ def mail_send_func(notification):
     ):
         sg_mail = Mail(from_email=sender_email, to_emails=[notification.user.email])
         sg_mail.template_id = notification.template_id
+        sg_mail.dynamic_template_data = {"notification": NotificationSerializer(notification).data}
         sg = SendGridAPIClient(settings.ANYMAIL["SENDGRID_API_KEY"])
         try:
             response = sg.send(sg_mail)

@@ -83,6 +83,7 @@ THIRD_PARTY_APPS = [
     "dry_rest_permissions",
     "rest_framework_simplejwt",
     "django_filters",
+    "generic_relations",
 ]
 
 LOCAL_APPS = [

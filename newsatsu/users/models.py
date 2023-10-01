@@ -1,7 +1,8 @@
 import datetime
+import uuid
 
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -87,11 +88,10 @@ class UnionModel(models.Model):
     total_floor_area = models.FloatField(_("延床面積"), null=True, blank=True)
 
     # date time
-    year_month_regex = RegexValidator(
-        regex=r'^\d{4}-\d{2}$',
-        message="Year-month must be in the format 'YYYY-MM'"
+    year_month_regex = RegexValidator(regex=r"^\d{4}-\d{2}$", message="Year-month must be in the format 'YYYY-MM'")
+    estimated_construction_time = models.CharField(
+        _("想定工事時期"), null=True, blank=True, max_length=7, validators=[year_month_regex]
     )
-    estimated_construction_time = models.CharField(_("想定工事時期"), null=True, blank=True, max_length=7, validators=[year_month_regex])
 
     def __str__(self) -> str:
         return self.user.name
@@ -239,7 +239,11 @@ class UserFileModel(models.Model):
 
 class UserTokenModel(TimeStampModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=255)
+    token = models.CharField(
+        unique=True,
+        max_length=255,
+        default=f'{datetime.datetime.now().strftime("%Y%m-%d%H-%M%S")}-{str(uuid.uuid4())}',
+    )
 
     def __str__(self) -> str:
         return self.user.username

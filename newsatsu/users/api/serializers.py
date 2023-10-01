@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from newsatsu.users.models import CompanyAchievementModel, CompanyModel, CompanyOverviewModel, UnionModel
 from newsatsu.users.models import User as UserType
-from newsatsu.users.models import UserFileModel
+from newsatsu.users.models import UserFileModel, UserTokenModel
 
 User = get_user_model()
 
@@ -67,3 +67,14 @@ class CompanyOverviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyOverviewModel
         fields = "__all__"
+
+
+class UserTokenSerializer(serializers.ModelSerializer):
+    user = user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
+    class Meta:
+        model = UserTokenModel
+        fields = ["user", "token"]
