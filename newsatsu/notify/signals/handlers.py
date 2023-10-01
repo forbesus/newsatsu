@@ -10,7 +10,7 @@ User = get_user_model()
 
 def handle_company_register_event(sender, instance, created, **kwargs):
     try:
-        if not created:
+        if created:
             super_user = User.objects.filter(is_superuser=True)
             for super in super_user:
                 template, _ = MailTypeModel.objects.get_or_create(label="user/create/")
@@ -24,25 +24,10 @@ def handle_company_register_event(sender, instance, created, **kwargs):
                     template_id=template.template_id,
                 )
                 notification.save()
-                mail_send_func(notification=notification)
 
             user = instance.user
             user_token = UserTokenModel(user=user)
             user_token.save()
-
-            template, _ = MailTypeModel.objects.get_or_create(label="user/register/")
-
-            notification = NotificationModel(
-                user=user,
-                title="新規登録",
-                content="プロフィールを登録しました。",
-                notify_type=ContentType.objects.get_for_model(UserTokenModel),
-                notify_id=user_token.pk,
-                on_site=True,
-                template_id=template.template_id,
-            )
-            notification.save()
-            mail_send_func(notification=notification)
 
     except Exception as err:
         print(err)
@@ -51,7 +36,7 @@ def handle_company_register_event(sender, instance, created, **kwargs):
 
 def handle_union_register_event(sender, instance, created, **kwargs):
     try:
-        if not created:
+        if created:
             super_user = User.objects.filter(is_superuser=True)
             for super in super_user:
                 template, _ = MailTypeModel.objects.get_or_create(label="user/create/")
@@ -65,32 +50,19 @@ def handle_union_register_event(sender, instance, created, **kwargs):
                     template_id=template.template_id,
                 )
                 notification.save()
-                mail_send_func(notification=notification)
 
             user = instance.user
             user_token = UserTokenModel(user=user)
             user_token.save()
 
-            template, _ = MailTypeModel.objects.get_or_create(label="user/register/")
-
-            notification = NotificationModel(
-                user=user,
-                title="新規登録",
-                content="プロフィールを登録しました。",
-                notify_type=ContentType.objects.get_for_model(UserTokenModel),
-                notify_id=user_token.pk,
-                on_site=True,
-                template_id=template.template_id,
-            )
-            notification.save()
-            mail_send_func(notification=notification)
     except Exception as err:
         print(err)
         pass
 
 
 def handle_send_mail_event(sender, instance, created, **kwargs):
-    mail_send_func(instance)
+    if created:
+        mail_send_func(instance)
 
 
 def handle_register_user_token_event(sender, instance, created, **kwargs):

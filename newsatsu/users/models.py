@@ -145,7 +145,7 @@ class CompanyModel(models.Model):
         return True
 
     def has_object_read_permission(self, request):
-        return self.user == request.user
+        return True
 
     @staticmethod
     def has_write_permission(request):
@@ -239,12 +239,16 @@ class UserFileModel(models.Model):
         return self.user.username
 
 
+def generate_token():
+    return f'{datetime.datetime.now().strftime("%Y%m-%d%H-%M%S")}-{str(uuid.uuid4())}'
+
+
 class UserTokenModel(TimeStampModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(
         unique=True,
         max_length=255,
-        default=f'{datetime.datetime.now().strftime("%Y%m-%d%H-%M%S")}-{str(uuid.uuid4())}',
+        default=generate_token,
     )
 
     def __str__(self) -> str:

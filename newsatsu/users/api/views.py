@@ -16,7 +16,7 @@ from newsatsu.users.models import (
     CompanyOverviewModel,
     UnionModel,
     UserFileModel,
-    UserTokenModel
+    UserTokenModel,
 )
 
 from .serializers import (
@@ -25,7 +25,7 @@ from .serializers import (
     CompanySerializer,
     UnionSerializer,
     UserSerializer,
-    UserTokenSerializer
+    UserTokenSerializer,
 )
 
 User = get_user_model()
@@ -139,21 +139,35 @@ class UserViewSet(ModelViewSet):
                 return Response(data=CompanySerializer(company).data, status=status.HTTP_206_PARTIAL_CONTENT)
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=False, methods=["POST"])
     def resend_verify(self, request: Request):
         try:
             email = request.data["email"]
-            if(email):
+            if email:
                 user = User.objects.get(email=email)
-                user_token = UserTokenModel(user=user)
-                user_token.save()
+                user_token = UserTokenModel.objects.create(user=user)
                 return Response(data=UserTokenSerializer(user_token).data, status=status.HTTP_201_CREATED)
             else:
                 return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
 
-                
+    @action(detail=False, methods=["POST"])
+    def verify_email(self, request: Request):
+        try:
+            token = request.data["token"]
+            if token:
+                user_token = UserTokenModel.objects.get(token=token)
+                user = user_token.user
+                user.is_verify = True
+                user.save()
+                return Response(data=UserSerializer(user).data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+        except UserTokenModel.DoesNotExist:
+            return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+
 
 class CompanyViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
@@ -221,6 +235,16 @@ class CompanyAchievementViewSet(ModelViewSet):
         achieves = CompanyAchievementModel.objects.filter(user=request.user)
         return Response(data=CompanyAchievementSerializer(achieves, many=True).data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=["GET"])
+    def get_achieve_for_union(self, request):
+        try:
+            company_id = request.data["companyId"]
+            user = CompanyModel.objects.get(pk=company_id).user
+            achieves = CompanyAchievementModel.objects.get_or_create(user=user)
+            return Response(data=CompanyAchievementSerializer(achieves, many=True).data, status=status.HTTP_200_OK)
+        except CompanyModel.DoesNotExist:
+            return Response(data="company is not exist", status=status.HTTP_400_BAD_REQUEST)
+
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         return super().list(request, *args, **kwargs)
 
@@ -247,8 +271,18 @@ class CompanyOverviewViewSet(ModelViewSet):
 
     @action(detail=False, methods=["GET"])
     def get_overview(self, request):
-        overview, created = CompanyOverviewModel.objects.get_or_create(user=request.user)
+        overview, _ = CompanyOverviewModel.objects.get_or_create(user=request.user)
         return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["GET"])
+    def get_overview_for_union(self, request):
+        try:
+            company_id = request.data["companyId"]
+            user = CompanyModel.objects.get(pk=company_id).user
+            overview, _ = CompanyOverviewModel.objects.get_or_create(user=user)
+            return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_200_OK)
+        except CompanyModel.DoesNotExist:
+            return Response(data="company is not exist", status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         try:

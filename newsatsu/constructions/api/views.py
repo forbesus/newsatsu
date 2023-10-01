@@ -243,7 +243,7 @@ class EvaluationViewSet(ModelViewSet):
     queryset = EvaluationModel.objects.all()
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["construction", "company__user__username"]
+    filterset_fields = ["construction", "company__user__username", "company"]
 
     def create(self, request: Request) -> Response:
         evaluation, created = EvaluationModel.objects.get_or_create(
