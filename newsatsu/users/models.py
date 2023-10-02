@@ -36,7 +36,7 @@ class User(AbstractUser):
     prefecture = models.CharField(_("都道府県"), max_length=100)
     city = models.CharField(_("市区町村"), max_length=50)
     house_number = models.CharField(_("番地"), max_length=20)
-    building_name = models.CharField(_("建物名"), max_length=100)
+    building_name = models.CharField(_("建物名"), max_length=100, null=True, blank=True)
 
     # site url
     url = models.CharField(_("ホームページ"), max_length=255, null=True, blank=True)
