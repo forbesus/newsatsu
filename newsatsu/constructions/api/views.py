@@ -82,8 +82,8 @@ class ConstructionViewSet(ModelViewSet):
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request: Request) -> Response:
-        instance = self.get_object()
         data = request.data
+        instance = self.get_object()
         if "status" in data:
             update_status = request.data["status"]
             if update_status == "question":

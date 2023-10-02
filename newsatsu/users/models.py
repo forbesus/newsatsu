@@ -165,6 +165,7 @@ class CompanyAchievementModel(TimeStampModel):
 
     type = models.CharField(choices=AchievementType.choices, max_length=20)
     title = models.CharField(max_length=512)
+    content = models.TextField()
 
     price = models.FloatField()
 

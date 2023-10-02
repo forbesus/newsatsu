@@ -222,6 +222,7 @@ class CompanyAchievementViewSet(ModelViewSet):
                 user=request.user,
                 type=data["type"],
                 title=data["title"],
+                content=data["content"],
                 counter=data["counter"],
                 price=data["price"],
             )
@@ -238,9 +239,9 @@ class CompanyAchievementViewSet(ModelViewSet):
     @action(detail=False, methods=["GET"])
     def get_achieve_for_union(self, request):
         try:
-            company_id = request.data["companyId"]
+            company_id = request.query_params.get("companyId")
             user = CompanyModel.objects.get(pk=company_id).user
-            achieves = CompanyAchievementModel.objects.get_or_create(user=user)
+            achieves = CompanyAchievementModel.objects.filter(user=user)
             return Response(data=CompanyAchievementSerializer(achieves, many=True).data, status=status.HTTP_200_OK)
         except CompanyModel.DoesNotExist:
             return Response(data="company is not exist", status=status.HTTP_400_BAD_REQUEST)
@@ -277,7 +278,7 @@ class CompanyOverviewViewSet(ModelViewSet):
     @action(detail=False, methods=["GET"])
     def get_overview_for_union(self, request):
         try:
-            company_id = request.data["companyId"]
+            company_id = request.query_params.get("companyId")
             user = CompanyModel.objects.get(pk=company_id).user
             overview, _ = CompanyOverviewModel.objects.get_or_create(user=user)
             return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_200_OK)
