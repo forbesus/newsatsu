@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from typing import Any
 
 from django_filters.rest_framework import DjangoFilterBackend
 from dry_rest_permissions.generics import DRYPermissions
@@ -81,7 +82,7 @@ class ConstructionViewSet(ModelViewSet):
         except Exception as err:
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request: Request) -> Response:
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         data = request.data
         instance = self.get_object()
         if "status" in data:
