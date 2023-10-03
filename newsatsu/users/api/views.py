@@ -14,6 +14,7 @@ from newsatsu.users.models import (
     CompanyAchievementModel,
     CompanyModel,
     CompanyOverviewModel,
+    TokenTypeModel,
     UnionModel,
     UserFileModel,
     UserTokenModel,
@@ -144,11 +145,11 @@ class UserViewSet(ModelViewSet):
     def resend_verify(self, request: Request):
         try:
             email = request.data["email"]
-            if email:
+            try:
                 user = User.objects.get(email=email)
-                user_token = UserTokenModel.objects.create(user=user)
+                user_token = UserTokenModel.objects.create(user=user, type=TokenTypeModel.CREATE)
                 return Response(data=UserTokenSerializer(user_token).data, status=status.HTTP_201_CREATED)
-            else:
+            except User.DoesNotExist:
                 return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
@@ -158,9 +159,38 @@ class UserViewSet(ModelViewSet):
         try:
             token = request.data["token"]
             if token:
-                user_token = UserTokenModel.objects.get(token=token)
+                user_token = UserTokenModel.objects.get(token=token, type=TokenTypeModel.CREATE)
                 user = user_token.user
                 user.is_verify = True
+                user.save()
+                return Response(data=UserSerializer(user).data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+        except UserTokenModel.DoesNotExist:
+            return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["POST"])
+    def forgot_password(self, request: Request):
+        try:
+            email = request.data["email"]
+            try:
+                user = User.objects.get(email=email)
+                user_token = UserTokenModel.objects.create(user=user, type=TokenTypeModel.PASSWORD)
+                return Response(data=UserTokenSerializer(user_token).data, status=status.HTTP_201_CREATED)
+            except User.DoesNotExist:
+                return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["POST"])
+    def reset_password(self, request: Request):
+        try:
+            token = request.data["token"]
+            password = request.data["password"]
+            if token and password:
+                user_token = UserTokenModel.objects.get(token=token, type=TokenTypeModel.PASSWORD)
+                user = user_token.user
+                user.set_password(password)
                 user.save()
                 return Response(data=UserSerializer(user).data, status=status.HTTP_201_CREATED)
             else:

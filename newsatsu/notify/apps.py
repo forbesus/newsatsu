@@ -25,3 +25,7 @@ class NotifyConfig(AppConfig):
         post_save.connect(func_nothrow(handlers.handle_send_mail_event), sender=NotificationModel)
 
         post_save.connect(func_nothrow(handlers.handle_register_user_token_event), sender="users.UserTokenModel")
+
+        post_save.connect(
+            func_nothrow(handlers.handle_request_company_event), sender="constructions.RequestCompanyModel"
+        )

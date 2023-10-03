@@ -244,7 +244,13 @@ def generate_token():
     return f'{datetime.datetime.now().strftime("%Y%m-%d%H-%M%S")}-{str(uuid.uuid4())}'
 
 
+class TokenTypeModel(models.TextChoices):
+    CREATE = _("create"), "user create"
+    PASSWORD = _("password"), "reset password"
+
+
 class UserTokenModel(TimeStampModel):
+    type = models.CharField(choices=TokenTypeModel.choices, max_length=20)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(
         unique=True,

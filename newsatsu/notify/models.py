@@ -12,7 +12,7 @@ class NotificationModel(TimeStampModel):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=500)
     content = models.TextField()
-    notify_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,related_name='+')
+    notify_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="+")
     notify_id = models.PositiveIntegerField()
     notify = GenericForeignKey("notify_type", "notify_id")
     on_mail = models.BooleanField(default=False)
@@ -36,10 +36,10 @@ class NotificationModel(TimeStampModel):
 
     @staticmethod
     def has_write_permission(request):
-        return request.user
+        return True
 
     def has_object_write_permission(self, request):
-        return request.user
+        return request.user == self.user
 
     @staticmethod
     def has_create_permission(request):
@@ -87,12 +87,22 @@ class MailTypeModel(models.Model):
     @classmethod
     def create_default_types(cls, **kwargs):
         cls.create(
-            label="user/create/",
+            label="users/create/",
             template_id="d-4f32172405384e7db1e2bcca4e371792",
             description="user create mail for admin",
         )
         cls.create(
-            label="user/register/",
+            label="users/register/",
             template_id="d-4f32172405384e7db1e2bcca4e371792",
             description="user create mail for users including unions and companies",
+        )
+        cls.create(
+            label="users/reset-password/",
+            template_id="d-b761ff894cbd46ce802ef11b1461dd6e",
+            description="reset password template",
+        )
+        cls.create(
+            label="constructions/request-company/",
+            template_id="d-6db0bc70ee924e8abd9b320eab52f0e4",
+            description="union requests the quotation to some company",
         )

@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
+from newsatsu.constructions.models import RequestCompanyModel
 from newsatsu.notify.models import MailTypeModel, NotificationModel
 from newsatsu.notify.tasks import mail_send_func
-from newsatsu.users.models import CompanyModel, UnionModel, UserTokenModel
+from newsatsu.users.models import CompanyModel, TokenTypeModel, UnionModel, UserTokenModel
 
 User = get_user_model()
 
@@ -13,7 +14,7 @@ def handle_company_register_event(sender, instance, created, **kwargs):
         if created:
             super_user = User.objects.filter(is_superuser=True)
             for super in super_user:
-                template, _ = MailTypeModel.objects.get_or_create(label="user/create/")
+                template, _ = MailTypeModel.objects.get_or_create(label="users/create/")
                 notification = NotificationModel(
                     user=super,
                     title="施工会社新規登録",
@@ -26,7 +27,7 @@ def handle_company_register_event(sender, instance, created, **kwargs):
                 notification.save()
 
             user = instance.user
-            user_token = UserTokenModel(user=user)
+            user_token = UserTokenModel(user=user, type=TokenTypeModel.CREATE)
             user_token.save()
 
     except Exception as err:
@@ -39,7 +40,7 @@ def handle_union_register_event(sender, instance, created, **kwargs):
         if created:
             super_user = User.objects.filter(is_superuser=True)
             for super in super_user:
-                template, _ = MailTypeModel.objects.get_or_create(label="user/create/")
+                template, _ = MailTypeModel.objects.get_or_create(label="users/create/")
                 notification = NotificationModel(
                     user=super,
                     title="管理組合新規登録",
@@ -52,7 +53,7 @@ def handle_union_register_event(sender, instance, created, **kwargs):
                 notification.save()
 
             user = instance.user
-            user_token = UserTokenModel(user=user)
+            user_token = UserTokenModel(user=user, type=TokenTypeModel.CREATE)
             user_token.save()
 
     except Exception as err:
@@ -66,15 +67,45 @@ def handle_send_mail_event(sender, instance, created, **kwargs):
 
 
 def handle_register_user_token_event(sender, instance, created, **kwargs):
-    template, _ = MailTypeModel.objects.get_or_create(label="user/register/")
+    if created:
+        if instance.type == TokenTypeModel.CREATE:
+            template, _ = MailTypeModel.objects.get_or_create(label="users/register/")
 
-    notification = NotificationModel(
-        user=instance.user,
-        title="新規登録",
-        content="プロフィールを登録しました。",
-        notify_type=ContentType.objects.get_for_model(UserTokenModel),
-        notify_id=instance.pk,
-        on_site=True,
-        template_id=template.template_id,
-    )
-    notification.save()
+            notification = NotificationModel(
+                user=instance.user,
+                title="新規登録",
+                content="プロフィールを登録しました。",
+                notify_type=ContentType.objects.get_for_model(UserTokenModel),
+                notify_id=instance.pk,
+                on_site=True,
+                template_id=template.template_id,
+            )
+            notification.save()
+        elif instance.type == TokenTypeModel.PASSWORD:
+            template, _ = MailTypeModel.objects.get_or_create(label="users/reset-password/")
+
+            notification = NotificationModel(
+                user=instance.user,
+                title="パスワード再設定",
+                content="パスワード再設定",
+                notify_type=ContentType.objects.get_for_model(UserTokenModel),
+                notify_id=instance.pk,
+                on_site=True,
+                template_id=template.template_id,
+            )
+            notification.save()
+
+
+def handle_request_company_event(sender, instance, created, **kwargs):
+    if created:
+        template, _ = MailTypeModel.objects.get_or_create(label="constructions/request-company/")
+
+        notification = NotificationModel(
+            user=instance.company.user,
+            title="見積依頼通知",
+            content=f"修繕工事{instance.construction.name}の見積もりをリクエストしています。",
+            notify_type=ContentType.objects.get_for_model(RequestCompanyModel),
+            notify_id=instance.pk,
+            template_id=template.template_id,
+        )
+        notification.save()
