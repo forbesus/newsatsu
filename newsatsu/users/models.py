@@ -140,6 +140,9 @@ class UnionConstructionHistoryModel(models.Model):
     def has_object_update_permission(self, request):
         return self.union.user == request.user
 
+    def has_object_destroy_permission(self, request):
+        return self.union.user == request.user
+
     @staticmethod
     def has_create_permission(request):
         return True

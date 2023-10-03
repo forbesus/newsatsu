@@ -255,6 +255,17 @@ class UnionConstructionHistoryViewSet(ModelViewSet):
         except UnionModel.DoesNotExist:
             return Response(data="union is not exist", status=status.HTTP_400_BAD_REQUEST)
 
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        data = request.data
+        instance = self.get_object()
+        if "title" in data and len(data["title"]) != 0:
+            instance.title = data["title"]
+        if "content" in data and len(data["content"]) != 0:
+            instance.content = data["content"]
+        instance.save()
+
+        return Response(data=UnionConstructionHistorySerializer(instance).data, status=status.HTTP_206_PARTIAL_CONTENT)
+
 
 class CompanyAchievementViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)

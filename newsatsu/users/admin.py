@@ -6,7 +6,14 @@ from django.utils.translation import gettext_lazy as _
 
 from newsatsu.users.forms import UserAdminChangeForm, UserAdminCreationForm
 
-from .models import CompanyAchievementModel, CompanyModel, UnionModel, UserFileModel, UserTokenModel
+from .models import (
+    CompanyAchievementModel,
+    CompanyModel,
+    UnionConstructionHistoryModel,
+    UnionModel,
+    UserFileModel,
+    UserTokenModel,
+)
 
 User = get_user_model()
 
@@ -60,3 +67,4 @@ admin.site.register(UnionModel)
 admin.site.register(CompanyModel)
 admin.site.register(CompanyAchievementModel)
 admin.site.register(UserTokenModel)
+admin.site.register(UnionConstructionHistoryModel)

@@ -17,6 +17,7 @@ from newsatsu.users.api.views import (
     CompanyAchievementViewSet,
     CompanyOverviewViewSet,
     CompanyViewSet,
+    UnionConstructionHistoryViewSet,
     UnionViewSet,
     UserViewSet,
 )
@@ -39,6 +40,7 @@ router.register("request-hiring", HireViewSet)
 router.register("request-evaluation", EvaluationViewSet)
 router.register("notifies", NotificationViewSet)
 router.register("overviews", CompanyOverviewViewSet)
+router.register("union-histories", UnionConstructionHistoryViewSet)
 
 
 app_name = "api"
