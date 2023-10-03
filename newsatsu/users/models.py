@@ -118,6 +118,33 @@ class UnionModel(models.Model):
         return True
 
 
+class UnionConstructionHistoryModel(models.Model):
+    union = models.ForeignKey(UnionModel, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+
+    def __str__(self) -> str:
+        return self.union.user.name
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return True
+
+    def has_object_update_permission(self, request):
+        return self.union.user == request.user
+
+    @staticmethod
+    def has_create_permission(request):
+        return True
+
+
 class CompanyModel(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # 会社規模

@@ -15,6 +15,7 @@ from newsatsu.users.models import (
     CompanyModel,
     CompanyOverviewModel,
     TokenTypeModel,
+    UnionConstructionHistoryModel,
     UnionModel,
     UserFileModel,
     UserTokenModel,
@@ -24,6 +25,7 @@ from .serializers import (
     CompanyAchievementSerializer,
     CompanyOverviewSerializer,
     CompanySerializer,
+    UnionConstructionHistorySerializer,
     UnionSerializer,
     UserSerializer,
     UserTokenSerializer,
@@ -235,6 +237,23 @@ class UnionViewSet(ModelViewSet):
             return Response(status=status.HTTP_200_OK, data=UnionSerializer(union).data)
         except UnionModel.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED, data="company is not exist")
+
+
+class UnionConstructionHistoryViewSet(ModelViewSet):
+    permission_classes = (DRYPermissions,)
+    serializer_class = UnionConstructionHistorySerializer
+    queryset = UnionConstructionHistoryModel.objects.all()
+
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        try:
+            title = request.data["title"]
+            content = request.data["content"]
+            union = UnionModel.objects.get(user=request.user)
+            history = UnionConstructionHistoryModel(union=union, title=title, content=content)
+            history.save()
+            return Response(data=UnionConstructionHistorySerializer(history).data, status=status.HTTP_201_CREATED)
+        except UnionModel.DoesNotExist:
+            return Response(data="union is not exist", status=status.HTTP_400_BAD_REQUEST)
 
 
 class CompanyAchievementViewSet(ModelViewSet):

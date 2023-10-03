@@ -1,7 +1,13 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from newsatsu.users.models import CompanyAchievementModel, CompanyModel, CompanyOverviewModel, UnionModel
+from newsatsu.users.models import (
+    CompanyAchievementModel,
+    CompanyModel,
+    CompanyOverviewModel,
+    UnionConstructionHistoryModel,
+    UnionModel,
+)
 from newsatsu.users.models import User as UserType
 from newsatsu.users.models import UserFileModel, UserTokenModel
 
@@ -25,11 +31,23 @@ class UserSerializer(serializers.ModelSerializer[UserType]):
         exclude = ["id", "password", "groups", "user_permissions", "is_staff", "first_name", "last_name"]
 
 
+class UnionConstructionHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UnionConstructionHistoryModel
+        fields = "__all__"
+
+
 class UnionSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    history = serializers.SerializerMethodField()
 
     def get_user(self, obj):
         return UserSerializer(obj.user).data
+
+    def get_history(self, obj):
+        return UnionConstructionHistorySerializer(
+            UnionConstructionHistoryModel.objects.filter(union=obj), many=True
+        ).data
 
     class Meta:
         model = UnionModel
