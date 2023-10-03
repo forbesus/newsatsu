@@ -12,7 +12,7 @@ from newsatsu.constructions.api.views import (
     RequestCompanyViewSet,
     RequestQAViewSet,
 )
-from newsatsu.notify.api.views import NotificationViewSet
+from newsatsu.notify.api.views import NewsViewSet, NotificationViewSet
 from newsatsu.users.api.views import (
     CompanyAchievementViewSet,
     CompanyOverviewViewSet,
@@ -41,6 +41,7 @@ router.register("request-evaluation", EvaluationViewSet)
 router.register("notifies", NotificationViewSet)
 router.register("overviews", CompanyOverviewViewSet)
 router.register("union-histories", UnionConstructionHistoryViewSet)
+router.register("news", NewsViewSet)
 
 
 app_name = "api"

@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from newsatsu.constructions.api.serializers import RequestCompanySerializer
 from newsatsu.constructions.models import RequestCompanyModel
-from newsatsu.notify.models import NotificationModel
+from newsatsu.notify.models import NewsModel, NotificationModel
 from newsatsu.users.api.serializers import CompanySerializer, UnionSerializer, UserSerializer, UserTokenSerializer
 from newsatsu.users.models import CompanyModel, UnionModel, User, UserTokenModel
 
@@ -27,3 +27,9 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationModel
         fields = "__all__"
+
+
+class NewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsModel
+        fields = ["news", "date"]

@@ -3,8 +3,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from dry_rest_permissions.generics import DRYPermissions
 from rest_framework import viewsets
 
-from newsatsu.notify.api.serializers import NotificationSerializer
-from newsatsu.notify.models import NotificationModel
+from newsatsu.notify.api.serializers import NewsSerializer, NotificationSerializer
+from newsatsu.notify.models import NewsModel, NotificationModel
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
@@ -18,3 +18,9 @@ class NotificationViewSet(viewsets.ModelViewSet):
         queryset = NotificationModel.objects.filter(user=self.request.user).exclude(title="新規登録")
 
         return queryset
+
+
+class NewsViewSet(viewsets.ModelViewSet):
+    permission_classes = (DRYPermissions,)
+    serializer_class = NewsSerializer
+    queryset = NewsModel.objects.filter(display_status=True).order_by("created_at")

@@ -106,3 +106,36 @@ class MailTypeModel(models.Model):
             template_id="d-6db0bc70ee924e8abd9b320eab52f0e4",
             description="union requests the quotation to some company",
         )
+
+
+class NewsModel(TimeStampModel):
+    news = models.TextField()
+
+    date = models.DateField()
+
+    display_status = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return self.news[:15] + "..."
+
+    class Meta:
+        verbose_name = "最近の状況"
+        verbose_name_plural = "最近の状況"
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        return False
+
+    def has_object_write_permission(self, request):
+        return False
+
+    @staticmethod
+    def has_create_permission(request):
+        return False

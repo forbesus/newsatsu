@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import MailTypeModel, NotificationModel
+from .models import NewsModel, NotificationModel
 
 admin.site.register(NotificationModel)
-admin.site.register(MailTypeModel)
+admin.site.register(NewsModel)
