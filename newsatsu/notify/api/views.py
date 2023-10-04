@@ -18,7 +18,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self) -> QuerySet:
         queryset = NotificationModel.objects.filter(user=self.request.user).exclude(
-            notify_type=ContentType.objects.get_for_model(UserTokenModel)
+            notify_type=ContentType.objects.get_for_model(UserTokenModel).pk
         )
 
         return queryset
