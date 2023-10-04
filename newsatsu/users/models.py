@@ -41,7 +41,7 @@ class User(AbstractUser):
     # site url
     url = models.CharField(_("ホームページ"), max_length=255, null=True, blank=True)
 
-    is_verify = models.BooleanField(default=False)
+    is_verify = models.BooleanField(_("メール認証確認"), default=False)
 
     def get_absolute_url(self) -> str:
         """Get URL for user's detail view.

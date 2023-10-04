@@ -42,6 +42,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "building_name",
                     "url",
                     "password",
+                    "is_verify",
                 )
             },
         ),
