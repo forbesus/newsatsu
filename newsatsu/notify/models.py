@@ -54,8 +54,12 @@ class MailTypeModel(models.Model):
     template_id = models.CharField(max_length=50, blank=True)
     description = models.CharField(max_length=100, blank=True)
 
+    class Meta:
+        verbose_name = "メールテンプレート"
+        verbose_name_plural = "メールテンプレート"
+
     def __str__(self) -> str:
-        return self.label
+        return self.description
 
     class RepeatedCreation(Exception):
         pass
@@ -89,7 +93,7 @@ class MailTypeModel(models.Model):
         cls.create(
             label="admin/create/user/",
             template_id="d-4f32172405384e7db1e2bcca4e371792",
-            description="user create mail for admin",
+            description="ユーザー登録通知",
         )
         cls.create(
             label="union/allow/",
@@ -170,7 +174,7 @@ class MailTypeModel(models.Model):
         cls.create(
             label="users/reset-password/",
             template_id="d-b761ff894cbd46ce802ef11b1461dd6e",
-            description="reset password template",
+            description="パスワードリセット",
         )
 
 
