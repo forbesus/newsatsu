@@ -87,24 +87,90 @@ class MailTypeModel(models.Model):
     @classmethod
     def create_default_types(cls, **kwargs):
         cls.create(
-            label="users/create/",
+            label="admin/create/user/",
             template_id="d-4f32172405384e7db1e2bcca4e371792",
             description="user create mail for admin",
         )
         cls.create(
-            label="users/register/",
+            label="union/allow/",
+            template_id="d-c737ebd8ee3849e4a7fa0c0d735bc72c",
+            description="管理組合用・登録承認時",
+        )
+        cls.create(
+            label="union/register/",
             template_id="d-4f32172405384e7db1e2bcca4e371792",
-            description="user create mail for users including unions and companies",
+            description="管理組合用・登録時",
+        )
+        cls.create(
+            label="union/request-company/",
+            template_id="d-e4826a072fc84f8dbf4100e02cad8936",
+            description="管理組合用・見積依頼",
+        )
+        cls.create(
+            label="union/question-company/",
+            template_id="d-f8649664407f4b258afc6622c79f3bb8",
+            description="管理組合用・質問",
+        )
+        cls.create(
+            label="union/quotation-company/",
+            template_id="d-b26edcdf83ab47a7a76d51b5133fc1d9",
+            description="管理組合用・見積",
+        )
+        cls.create(
+            label="union/hearing-company/",
+            template_id="d-0fe877786640496f953e1959b87d0c45",
+            description="管理組合用・ヒアリング",
+        )
+        cls.create(
+            label="union/other/",
+            template_id="d-e9dcd56924b743d08955bb172c64a686",
+            description="管理組合用・その他",
+        )
+
+        cls.create(
+            label="company/other/",
+            template_id="d-c150a1aa4db347e89568950448d1f5df",
+            description="施工会社用・その他",
+        )
+        cls.create(
+            label="company/hiring/",
+            template_id="d-fdf052628e6e4adca6b33046316b99af",
+            description="施工会社用・ヒアリング会後の結果",
+        )
+        cls.create(
+            label="company/hearing/",
+            template_id="d-02118881b3494f089c1d7679361eace9",
+            description="施工会社用・ヒアリング会",
+        )
+        cls.create(
+            label="company/answer/",
+            template_id="d-c5406e11b074498fa6ca917e481293f8",
+            description="施工会社用・回答",
+        )
+        cls.create(
+            label="company/request/",
+            template_id="d-2a926ae0584f4db193d708e265de6803",
+            description="施工会社用・見積依頼",
+        )
+        cls.create(
+            label="company/start-work/",
+            template_id="d-559a2e1a25874aebabcaffdbf4f9228a",
+            description="施工会社用 ・サイト利用開始",
+        )
+        cls.create(
+            label="company/allow/",
+            template_id="d-8b51c457079946e097df52c7f34c57be",
+            description="施工会社用 ・登録承認後",
+        )
+        cls.create(
+            label="company/register/",
+            template_id="d-aac71fcab5b040c2b85879c2759f805e",
+            description="施工会社用 ・登録時",
         )
         cls.create(
             label="users/reset-password/",
             template_id="d-b761ff894cbd46ce802ef11b1461dd6e",
             description="reset password template",
-        )
-        cls.create(
-            label="constructions/request-company/",
-            template_id="d-6db0bc70ee924e8abd9b320eab52f0e4",
-            description="union requests the quotation to some company",
         )
 
 
