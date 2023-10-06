@@ -11,7 +11,7 @@ SECRET_KEY = env(
     default="PUSvDNeg29PjITBFHMRBO5xxFIWRWZIza18cpGoR2W9hgkRVaPJX6cXyDQBpp1B8",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "153.127.10.51", "ik1-403-33547.vs.sakura.ne.jp"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "bestreform.jp"]
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -57,7 +57,8 @@ INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 # cors
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://153.127.10.51:5173", "http://153.127.10.51"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "https://bestreform.jp"]
+CSRF_TRUSTED_ORIGINS = ["https://bestreform.jp"]
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
