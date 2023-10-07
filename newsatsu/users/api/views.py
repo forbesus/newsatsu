@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
 from dry_rest_permissions.generics import DRYPermissions
 from rest_framework import status
@@ -97,8 +98,13 @@ class UserViewSet(ModelViewSet):
                 )
                 company.save()
                 return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
-        except Exception as err:
-            return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError as err:
+            if "email" in str(err):
+                return Response(data="メールがすでに使用されています。", status=status.HTTP_400_BAD_REQUEST)
+            elif "username" in str(err):
+                return Response(data="ユーザー名がすでに使用されています。", status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response(data="サーバーエラー", status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         try:
@@ -178,12 +184,9 @@ class UserViewSet(ModelViewSet):
     def forgot_password(self, request: Request):
         try:
             email = request.data["email"]
-            try:
-                user = User.objects.get(email=email)
-                user_token = UserTokenModel.objects.create(user=user, type=TokenTypeModel.PASSWORD)
-                return Response(data=UserTokenSerializer(user_token).data, status=status.HTTP_201_CREATED)
-            except User.DoesNotExist:
-                return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(email=email)
+            user_token = UserTokenModel.objects.create(user=user, type=TokenTypeModel.PASSWORD)
+            return Response(data=UserTokenSerializer(user_token).data, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
 
@@ -202,6 +205,8 @@ class UserViewSet(ModelViewSet):
                 return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
         except UserTokenModel.DoesNotExist:
             return Response(data="登録されていません。もう一度登録してください", status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response(data="サーバーエラー", status=status.HTTP_400_BAD_REQUEST)
 
 
 class CompanyViewSet(ModelViewSet):
