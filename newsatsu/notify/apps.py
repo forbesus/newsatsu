@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_migrate, post_save
+from django.db.models.signals import post_migrate, post_save, pre_save
 
 # from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
@@ -21,6 +21,8 @@ class NotifyConfig(AppConfig):
         post_save.connect(func_nothrow(handlers.handle_company_register_event), sender="users.CompanyModel")
 
         post_save.connect(func_nothrow(handlers.handle_union_register_event), sender="users.UnionModel")
+
+        pre_save.connect(func_nothrow(handlers.handle_allow_users_event), "users.User")
 
         post_save.connect(func_nothrow(handlers.handle_send_mail_event), sender=NotificationModel)
 

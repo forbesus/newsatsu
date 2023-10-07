@@ -23,6 +23,13 @@ if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     admin.site.login = decorators.login_required(admin.site.login)  # type: ignore[method-assign]
 
 
+class UserFileInline(admin.TabularInline):
+    model = UserFileModel
+    extra = 0
+    can_delete = False
+    readonly_fields = ("file", "user")
+
+
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
@@ -41,29 +48,29 @@ class UserAdmin(auth_admin.UserAdmin):
                     "house_number",
                     "building_name",
                     "url",
-                    "password",
-                    "is_verify",
+                    # "password",
+                    "is_allow",
                 )
             },
         ),
         (_("Personal info"), {"fields": ("name", "email")}),
-        (
-            _("Permissions"),
-            {
-                "fields": (
-                    "is_active",
-                    "is_staff",
-                    "is_superuser",
-                ),
-            },
-        ),
+        # (
+        #     _("Permissions"),
+        #     {
+        #         "fields": (
+        #             "is_active",
+        #             "is_staff",
+        #             "is_superuser",
+        #         ),
+        #     },
+        # ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     list_display = ["username", "name", "is_superuser"]
     search_fields = ["name"]
+    inlines = [UserFileInline]
 
 
-admin.site.register(UserFileModel)
 admin.site.register(UnionModel)
 admin.site.register(CompanyModel)
 admin.site.register(CompanyAchievementModel)

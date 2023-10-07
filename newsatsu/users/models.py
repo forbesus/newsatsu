@@ -10,6 +10,11 @@ from django.utils.translation import gettext_lazy as _
 from newsatsu.utils.models import TimeStampModel
 
 
+class UserTypeModel(models.TextChoices):
+    UNION = _("unions"), "管理組合"
+    COMPANY = _("companies"), "施工会社"
+
+
 class User(AbstractUser):
     """
     Default custom user model for ニューサツ.
@@ -21,10 +26,6 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
-
-    class UserTypeModel(models.TextChoices):
-        UNION = _("unions"), "管理組合"
-        COMPANY = _("companies"), "施工会社"
 
     # First and last name do not cover name patterns around the globe
     name = models.CharField(_("会社名"), blank=True, max_length=255)
@@ -42,6 +43,8 @@ class User(AbstractUser):
     url = models.CharField(_("ホームページ"), max_length=255, null=True, blank=True)
 
     is_verify = models.BooleanField(_("メール認証確認"), default=False)
+
+    is_allow = models.BooleanField(_("利用承認"), default=False)
 
     def get_absolute_url(self) -> str:
         """Get URL for user's detail view.
@@ -268,6 +271,10 @@ class UserFileModel(models.Model):
 
     def __str__(self) -> str:
         return self.user.username
+
+    class Meta:
+        verbose_name = "提出書類"
+        verbose_name_plural = "提出書類"
 
 
 def generate_token():

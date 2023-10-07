@@ -87,10 +87,12 @@ class UserViewSet(ModelViewSet):
                     total_units=request.data["total_units"],
                     floor_number=request.data["floor_number"],
                     building_number=request.data["building_number"],
-                    age=request.data.get("age"),
-                    site_area=request.data.get("site_area"),
-                    building_area=request.data.get("building_area"),
-                    total_floor_area=request.data.get("total_floor_area"),
+                    age=request.data.get("age") if request.data.get("age") != "" else 0,
+                    site_area=request.data.get("site_area") if request.data.get("site_area") != "" else 0,
+                    building_area=request.data.get("building_area") if request.data.get("building_area") != "" else 0,
+                    total_floor_area=request.data.get("total_floor_area")
+                    if request.data.get("total_floor_area") != ""
+                    else 0,
                     estimated_construction_time=request.data.get("estimated_construction_time"),
                 )
                 company.save()
@@ -141,6 +143,7 @@ class UserViewSet(ModelViewSet):
                 company.save()
                 return Response(data=CompanySerializer(company).data, status=status.HTTP_206_PARTIAL_CONTENT)
         except Exception as err:
+            print("err", err)
             return Response(data=json.dumps(err.__dict__), status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["POST"])

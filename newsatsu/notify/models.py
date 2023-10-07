@@ -96,14 +96,24 @@ class MailTypeModel(models.Model):
             description="ユーザー登録通知",
         )
         cls.create(
-            label="union/allow/",
+            label="register/company/",
+            template_id="d-aac71fcab5b040c2b85879c2759f805e",
+            description="施工会社用 ・登録時",
+        )
+        cls.create(
+            label="register/union/",
+            template_id="d-4f32172405384e7db1e2bcca4e371792",
+            description="管理組合用・登録時",
+        )
+        cls.create(
+            label="allow/union/",
             template_id="d-c737ebd8ee3849e4a7fa0c0d735bc72c",
             description="管理組合用・登録承認時",
         )
         cls.create(
-            label="union/register/",
-            template_id="d-4f32172405384e7db1e2bcca4e371792",
-            description="管理組合用・登録時",
+            label="allow/company/",
+            template_id="d-8b51c457079946e097df52c7f34c57be",
+            description="施工会社用 ・登録承認後",
         )
         cls.create(
             label="union/request-company/",
@@ -160,16 +170,6 @@ class MailTypeModel(models.Model):
             label="company/start-work/",
             template_id="d-559a2e1a25874aebabcaffdbf4f9228a",
             description="施工会社用 ・サイト利用開始",
-        )
-        cls.create(
-            label="company/allow/",
-            template_id="d-8b51c457079946e097df52c7f34c57be",
-            description="施工会社用 ・登録承認後",
-        )
-        cls.create(
-            label="company/register/",
-            template_id="d-aac71fcab5b040c2b85879c2759f805e",
-            description="施工会社用 ・登録時",
         )
         cls.create(
             label="users/reset-password/",

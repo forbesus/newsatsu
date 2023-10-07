@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from newsatsu.constructions.models import RequestCompanyModel
 from newsatsu.notify.models import MailTypeModel, NotificationModel
 from newsatsu.notify.tasks import mail_send_func
-from newsatsu.users.models import CompanyModel, TokenTypeModel, UnionModel, UserTokenModel
+from newsatsu.users.models import CompanyModel, TokenTypeModel, UnionModel, UserTokenModel, UserTypeModel
 
 User = get_user_model()
 
@@ -61,6 +61,34 @@ def handle_union_register_event(sender, instance, created, **kwargs):
         pass
 
 
+def handle_allow_users_event(sender, instance, update_fields, **kwargs):
+    try:
+        user = User.objects.get(pk=instance.pk)
+        if not user.is_allow and instance.is_allow:
+            if instance.user_type == UserTypeModel.UNION:
+                template, _ = MailTypeModel.objects.get_or_create(label="allow/union/")
+            elif instance.user_type == UserTypeModel.COMPANY:
+                template, _ = MailTypeModel.objects.get_or_create(label="allow/company/")
+            else:
+                return False
+
+            notification = NotificationModel(
+                user=instance,
+                title="ご登録情報が承認されました",
+                content="ご登録情報が承認されました。どうぞ、サイトをご利用ください。",
+                notify_type=ContentType.objects.get_for_model(sender),
+                notify_id=instance.pk,
+                on_site=True,
+                template_id=template.template_id,
+            )
+            notification.save()
+
+    except User.DoesNotExist:
+        pass
+
+    pass
+
+
 def handle_send_mail_event(sender, instance, created, **kwargs):
     if created:
         mail_send_func(instance)
@@ -69,7 +97,12 @@ def handle_send_mail_event(sender, instance, created, **kwargs):
 def handle_register_user_token_event(sender, instance, created, **kwargs):
     if created:
         if instance.type == TokenTypeModel.CREATE:
-            template, _ = MailTypeModel.objects.get_or_create(label="users/register/")
+            if instance.user.user_type == UserTypeModel.UNION:
+                template, _ = MailTypeModel.objects.get_or_create(label="register/union/")
+            elif instance.user.user_type == UserTypeModel.COMPANY:
+                template, _ = MailTypeModel.objects.get_or_create(label="register/company/")
+            else:
+                return False
 
             notification = NotificationModel(
                 user=instance.user,
