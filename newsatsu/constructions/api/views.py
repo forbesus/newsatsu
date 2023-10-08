@@ -232,6 +232,7 @@ class HireViewSet(ModelViewSet):
         hiring, created = HireModel.objects.get_or_create(
             construction=ConstructionModel.objects.get(pk=request.data["construction"]),
             company=CompanyModel.objects.get(pk=request.data["company"]),
+            status=request.data['status']
         )
         hiring.save()
         return Response(data=HireSerializer(hiring).data, status=status.HTTP_201_CREATED)
