@@ -1,7 +1,15 @@
+"""
+There are event list for mail and notification
+
+Event list start with handle_company_, are notifications and mails for Unions
+and Event list start with handle_union_, are notifications and mails for Compannies
+"""
+import logging
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
-from newsatsu.constructions.models import RequestCompanyModel
+from newsatsu.constructions.models import BidModel, HearingModel, RequestCompanyModel, RequestQAModel
 from newsatsu.notify.models import MailTypeModel, NotificationModel
 from newsatsu.notify.tasks import mail_send_func
 from newsatsu.users.models import CompanyModel, TokenTypeModel, UnionModel, UserTokenModel, UserTypeModel
@@ -31,7 +39,7 @@ def handle_company_register_event(sender, instance, created, **kwargs):
             user_token.save()
 
     except Exception as err:
-        print(err)
+        logging.error(err)
         pass
 
 
@@ -129,9 +137,9 @@ def handle_register_user_token_event(sender, instance, created, **kwargs):
             notification.save()
 
 
-def handle_request_company_event(sender, instance, created, **kwargs):
+def handle_union_request_company_event(sender, instance, created, **kwargs):
     if created:
-        template, _ = MailTypeModel.objects.get_or_create(label="constructions/request-company/")
+        template, _ = MailTypeModel.objects.get_or_create(label="company/request/")
 
         notification = NotificationModel(
             user=instance.company.user,
@@ -142,3 +150,129 @@ def handle_request_company_event(sender, instance, created, **kwargs):
             template_id=template.template_id,
         )
         notification.save()
+
+
+def handle_union_answer_event(sender, instance, **kwargs):
+    try:
+        question_answer = RequestQAModel.objects.get(pk=instance.pk)
+        if question_answer.answer == "" and instance.answer != "":
+            template, _ = MailTypeModel.objects.get_or_create(label="company/answer/")
+
+            notification = NotificationModel(
+                user=instance.company.user,
+                title="質疑の回答がありました",
+                content=f"{instance.construction.union.user.name}管理組合様より、質疑の回答がありました。ご確認ください。",
+                notify_type=ContentType.objects.get_for_model(RequestQAModel),
+                notify_id=instance.pk,
+                template_id=template.template_id,
+            )
+            notification.save()
+    except Exception as err:
+        logging.error(err)
+        pass
+
+
+def handle_union_request_hiring_event(sender, instance, created, **kwargs):
+    if created:
+        template, _ = MailTypeModel.objects.get_or_create(label="company/hiring/")
+
+        notification = NotificationModel(
+            user=instance.company.user,
+            title="ヒアリング会の結果通知",
+            content=f"{instance.construction.union.user.name}管理組合様より、ヒアリング会の結果が届きました。ご確認ください。",
+            notify_type=ContentType.objects.get_for_model(RequestCompanyModel),
+            notify_id=instance.pk,
+            template_id=template.template_id,
+        )
+        notification.save()
+
+
+def handle_union_request_hearing_event(sender, instance, created, **kwargs):
+    if created:
+        template, _ = MailTypeModel.objects.get_or_create(label="company/hearing/")
+
+        notification = NotificationModel(
+            user=instance.company.user,
+            title="ヒアリング会への招待がありました",
+            content=f"{instance.construction.union.user.name}管理組合様より、ヒアリング会の招待がありました。日程をご確認の上、ご対応お願い致します。",
+            notify_type=ContentType.objects.get_for_model(HearingModel),
+            notify_id=instance.pk,
+            template_id=template.template_id,
+        )
+        notification.save()
+
+
+def handle_company_request_status_event(sender, instance, **kwargs):
+    try:
+        request_company = RequestCompanyModel.objects.get(pk=instance.pk)
+        if (
+            request_company.status == RequestCompanyModel.RequestCompanyStatus.REQUESTING
+            and instance.status
+            and instance.status != RequestCompanyModel.RequestCompanyStatus.REQUESTING
+        ):
+            template, _ = MailTypeModel.objects.get_or_create(label="union/request-company/")
+
+            notification = NotificationModel(
+                user=instance.construction.union.user,
+                title="見積り依頼会社から返信が届きました",
+                content=f"修繕工事{instance.construction.name}の見積依頼をされた会社から返事が届きました。ご確認ください。",
+                notify_type=ContentType.objects.get_for_model(RequestCompanyModel),
+                notify_id=instance.pk,
+                template_id=template.template_id,
+            )
+            notification.save()
+    except Exception as err:
+        logging.error(err)
+
+
+def handle_company_question_event(sender, instance, created, **kwargs):
+    if created:
+        template, _ = MailTypeModel.objects.get_or_create(label="union/question-company/")
+
+        notification = NotificationModel(
+            user=instance.construction.union.user,
+            title="施工会社様より返信が届きました",
+            content=f"{instance.company.user.name}施行会社様より、ご質問が届きました。ご確認ください。",
+            notify_type=ContentType.objects.get_for_model(RequestQAModel),
+            notify_id=instance.pk,
+            template_id=template.template_id,
+        )
+        notification.save()
+
+
+def handle_company_bid_event(sender, instance, created, **kwargs):
+    if created:
+        template, _ = MailTypeModel.objects.get_or_create(label="union/quotation-company/")
+
+        notification = NotificationModel(
+            user=instance.construction.union.user,
+            title="見積書の提出がされました",
+            content=f"{instance.company.user.name}施行会社様より、見積書の提出がされました。ご確認ください。",
+            notify_type=ContentType.objects.get_for_model(BidModel),
+            notify_id=instance.pk,
+            template_id=template.template_id,
+        )
+        notification.save()
+
+
+def handle_company_hearing_status_event(sender, instance, **kwargs):
+    try:
+        hearing = HearingModel.objects.get(pk=instance.pk)
+        if hearing.status == HearingModel.HearingStatus.REQUESTING and (
+            instance.status == HearingModel.HearingStatus.ACCEPT
+            or instance.status == HearingModel.HearingStatus.DECLINE
+        ):
+            template, _ = MailTypeModel.objects.get_or_create(label="union/hearing-company/")
+
+            notification = NotificationModel(
+                user=instance.construction.union.user,
+                title="ヒアリング会への回答がありました",
+                content=f"{instance.company.user.name}施行会社様より、ヒアイング会への回答がありました。ご確認ください。",
+                notify_type=ContentType.objects.get_for_model(HearingModel),
+                notify_id=instance.pk,
+                template_id=template.template_id,
+            )
+            notification.save()
+    except Exception as err:
+        logging.error(err)
+        pass

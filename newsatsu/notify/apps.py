@@ -29,5 +29,20 @@ class NotifyConfig(AppConfig):
         post_save.connect(func_nothrow(handlers.handle_register_user_token_event), sender="users.UserTokenModel")
 
         post_save.connect(
-            func_nothrow(handlers.handle_request_company_event), sender="constructions.RequestCompanyModel"
+            func_nothrow(handlers.handle_union_request_company_event), sender="constructions.RequestCompanyModel"
         )
+
+        pre_save.connect(
+            func_nothrow(handlers.handle_company_request_status_event), sender="constructions.RequestCompanyModel"
+        )
+
+        post_save.connect(func_nothrow(handlers.handle_company_question_event), sender="constructions.RequestQAModel")
+        pre_save.connect(func_nothrow(handlers.handle_union_answer_event), sender="constructions.RequestQAModel")
+        post_save.connect(func_nothrow(handlers.handle_company_bid_event), sender="constructions.BidModel")
+        post_save.connect(
+            func_nothrow(handlers.handle_union_request_hearing_event), sender="constructions.HearingModel"
+        )
+        pre_save.connect(
+            func_nothrow(handlers.handle_company_hearing_status_event), sender="constructions.HearingModel"
+        )
+        post_save.connect(func_nothrow(handlers.handle_union_request_hiring_event), sender="constructions.HireModel")
