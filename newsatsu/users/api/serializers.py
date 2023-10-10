@@ -15,9 +15,18 @@ User = get_user_model()
 
 
 class UserFileSerializer(serializers.ModelSerializer):
+    file_info = serializers.SerializerMethodField()
+    
+    def get_file_info(self, obj):
+        file = obj.file
+        file_info = {
+            'name': file.name,
+            'url': file.url,
+        }
+        return file_info
     class Meta:
         model = UserFileModel
-        fields = ["file"]
+        fields = ["file", "file_info"]
 
 
 class UserSerializer(serializers.ModelSerializer[UserType]):

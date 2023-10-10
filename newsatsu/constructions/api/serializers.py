@@ -89,7 +89,7 @@ class BidFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BidFileModel
-        fields = ["file"]
+        fields = ["file", "file_info"]
 
 
 class BidSerializer(serializers.ModelSerializer):
