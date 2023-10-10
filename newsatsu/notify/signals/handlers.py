@@ -143,7 +143,7 @@ def handle_union_request_company_event(sender, instance, created, **kwargs):
 
         notification = NotificationModel(
             user=instance.company.user,
-            title="管理組合から大規模修繕工事の見積依頼が届いてます",
+            title="見積り依頼会社として選定されました",
             content=f"修繕工事{instance.construction.name}の見積もりをリクエストしています。",
             notify_type=ContentType.objects.get_for_model(RequestCompanyModel),
             notify_id=instance.pk,
