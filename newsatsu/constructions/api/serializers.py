@@ -15,9 +15,19 @@ from newsatsu.users.api.serializers import CompanySerializer, UnionSerializer
 
 
 class ConstructionFileSerializer(serializers.ModelSerializer):
+    file_info = serializers.SerializerMethodField()
+
+    def get_file_info(self, obj):
+        file = obj.file
+        file_info = {
+            "name": file.name,
+            "url": file.url,
+        }
+        return file_info
+
     class Meta:
         model = ConstructionFileModel
-        fields = ["file"]
+        exclude = ["construction"]
 
 
 class ConstructionSerializer(serializers.ModelSerializer):
@@ -67,6 +77,16 @@ class RequestQASerializer(serializers.ModelSerializer):
 
 
 class BidFileSerializer(serializers.ModelSerializer):
+    file_info = serializers.SerializerMethodField()
+
+    def get_file_info(self, obj):
+        file = obj.file
+        file_info = {
+            "name": file.name,
+            "url": file.url,
+        }
+        return file_info
+
     class Meta:
         model = BidFileModel
         fields = ["file"]

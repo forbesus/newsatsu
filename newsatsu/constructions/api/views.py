@@ -115,6 +115,11 @@ class ConstructionViewSet(ModelViewSet):
 
         return Response(data=ConstructionSerializer(instance).data, status=status.HTTP_201_CREATED)
 
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class RequestCompanyViewSet(ModelViewSet):
     permission_classes = (DRYPermissions,)
@@ -232,7 +237,7 @@ class HireViewSet(ModelViewSet):
         hiring, created = HireModel.objects.get_or_create(
             construction=ConstructionModel.objects.get(pk=request.data["construction"]),
             company=CompanyModel.objects.get(pk=request.data["company"]),
-            status=request.data['status']
+            status=request.data["status"],
         )
         hiring.save()
         return Response(data=HireSerializer(hiring).data, status=status.HTTP_201_CREATED)
