@@ -30,7 +30,7 @@ def handle_company_register_event(sender, instance, created, **kwargs):
                     notify_type=ContentType.objects.get_for_model(CompanyModel),
                     notify_id=instance.pk,
                     on_site=True,
-                    template_id=template.template_id,
+                    template=template,
                 )
                 notification.save()
 
@@ -56,7 +56,7 @@ def handle_union_register_event(sender, instance, created, **kwargs):
                     notify_type=ContentType.objects.get_for_model(UnionModel),
                     notify_id=instance.pk,
                     on_site=True,
-                    template_id=template.template_id,
+                    template=template,
                 )
                 notification.save()
 
@@ -87,7 +87,7 @@ def handle_allow_users_event(sender, instance, update_fields, **kwargs):
                 notify_type=ContentType.objects.get_for_model(sender),
                 notify_id=instance.pk,
                 on_site=True,
-                template_id=template.template_id,
+                template=template,
             )
             notification.save()
 
@@ -119,7 +119,7 @@ def handle_register_user_token_event(sender, instance, created, **kwargs):
                 notify_type=ContentType.objects.get_for_model(UserTokenModel),
                 notify_id=instance.pk,
                 on_site=True,
-                template_id=template.template_id,
+                template=template,
             )
             notification.save()
         elif instance.type == TokenTypeModel.PASSWORD:
@@ -132,7 +132,7 @@ def handle_register_user_token_event(sender, instance, created, **kwargs):
                 notify_type=ContentType.objects.get_for_model(UserTokenModel),
                 notify_id=instance.pk,
                 on_site=True,
-                template_id=template.template_id,
+                template=template,
             )
             notification.save()
 
@@ -147,7 +147,7 @@ def handle_union_request_company_event(sender, instance, created, **kwargs):
             content=f"修繕工事{instance.construction.name}の見積もりをリクエストしています。",
             notify_type=ContentType.objects.get_for_model(RequestCompanyModel),
             notify_id=instance.pk,
-            template_id=template.template_id,
+            template=template,
         )
         notification.save()
 
@@ -155,7 +155,9 @@ def handle_union_request_company_event(sender, instance, created, **kwargs):
 def handle_union_answer_event(sender, instance, **kwargs):
     try:
         question_answer = RequestQAModel.objects.get(pk=instance.pk)
-        if question_answer.answer == "" and instance.answer != "":
+        if (question_answer.answer == "" or question_answer.answer is None) and (
+            instance.answer != "" or instance.answer is not None
+        ):
             template, _ = MailTypeModel.objects.get_or_create(label="company/answer/")
 
             notification = NotificationModel(
@@ -164,7 +166,7 @@ def handle_union_answer_event(sender, instance, **kwargs):
                 content=f"{instance.construction.union.user.name}管理組合様より、質疑の回答がありました。ご確認ください。",
                 notify_type=ContentType.objects.get_for_model(RequestQAModel),
                 notify_id=instance.pk,
-                template_id=template.template_id,
+                template=template,
             )
             notification.save()
     except Exception as err:
@@ -182,7 +184,7 @@ def handle_union_request_hiring_event(sender, instance, created, **kwargs):
             content=f"{instance.construction.union.user.name}管理組合様より、ヒアリング会の結果が届きました。ご確認ください。",
             notify_type=ContentType.objects.get_for_model(RequestCompanyModel),
             notify_id=instance.pk,
-            template_id=template.template_id,
+            template=template,
         )
         notification.save()
 
@@ -197,7 +199,7 @@ def handle_union_request_hearing_event(sender, instance, created, **kwargs):
             content=f"{instance.construction.union.user.name}管理組合様より、ヒアリング会の招待がありました。日程をご確認の上、ご対応お願い致します。",
             notify_type=ContentType.objects.get_for_model(HearingModel),
             notify_id=instance.pk,
-            template_id=template.template_id,
+            template=template,
         )
         notification.save()
 
@@ -218,7 +220,7 @@ def handle_company_request_status_event(sender, instance, **kwargs):
                 content=f"修繕工事{instance.construction.name}の見積依頼をされた会社から返事が届きました。ご確認ください。",
                 notify_type=ContentType.objects.get_for_model(RequestCompanyModel),
                 notify_id=instance.pk,
-                template_id=template.template_id,
+                template=template,
             )
             notification.save()
     except Exception as err:
@@ -235,7 +237,7 @@ def handle_company_question_event(sender, instance, created, **kwargs):
             content=f"{instance.company.user.name}施行会社様より、ご質問が届きました。ご確認ください。",
             notify_type=ContentType.objects.get_for_model(RequestQAModel),
             notify_id=instance.pk,
-            template_id=template.template_id,
+            template=template,
         )
         notification.save()
 
@@ -250,7 +252,7 @@ def handle_company_bid_event(sender, instance, created, **kwargs):
             content=f"{instance.company.user.name}施行会社様より、見積書の提出がされました。ご確認ください。",
             notify_type=ContentType.objects.get_for_model(BidModel),
             notify_id=instance.pk,
-            template_id=template.template_id,
+            template=template,
         )
         notification.save()
 
@@ -270,7 +272,7 @@ def handle_company_hearing_status_event(sender, instance, **kwargs):
                 content=f"{instance.company.user.name}施行会社様より、ヒアイング会への回答がありました。ご確認ください。",
                 notify_type=ContentType.objects.get_for_model(HearingModel),
                 notify_id=instance.pk,
-                template_id=template.template_id,
+                template=template,
             )
             notification.save()
     except Exception as err:

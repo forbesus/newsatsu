@@ -27,10 +27,10 @@ def mail_send_func(notification):
         and Mail
         and hasattr(settings, "ANYMAIL")
         and settings.ANYMAIL["SENDGRID_API_KEY"]
-        and notification.template_id
+        and notification.template.template_id
     ):
         sg_mail = Mail(from_email=sender_email, to_emails=[notification.user.email])
-        sg_mail.template_id = notification.template_id
+        sg_mail.template_id = notification.template.template_id
         sg_mail.dynamic_template_data = {"notification": NotificationSerializer(notification).data}
         sg = SendGridAPIClient(settings.ANYMAIL["SENDGRID_API_KEY"])
         try:

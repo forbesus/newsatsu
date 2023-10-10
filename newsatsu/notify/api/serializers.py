@@ -9,16 +9,26 @@ from newsatsu.constructions.api.serializers import (
     RequestQASerializer,
 )
 from newsatsu.constructions.models import BidModel, HearingModel, HireModel, RequestCompanyModel, RequestQAModel
-from newsatsu.notify.models import NewsModel, NotificationModel
+from newsatsu.notify.models import MailTypeModel, NewsModel, NotificationModel
 from newsatsu.users.api.serializers import CompanySerializer, UnionSerializer, UserSerializer, UserTokenSerializer
 from newsatsu.users.models import CompanyModel, UnionModel, User, UserTokenModel
 
 
+class MailTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MailTypeModel
+        fields = ["template_id", "path"]
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    template = serializers.SerializerMethodField()
 
     def get_user(self, obj):
         return UserSerializer(obj.user).data
+
+    def get_template(self, obj):
+        return MailTypeSerializer(obj.template).data
 
     notify = GenericRelatedField(
         {
