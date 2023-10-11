@@ -231,7 +231,7 @@ class HireViewSet(ModelViewSet):
     queryset = HireModel.objects.all()
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["construction", "company__user__username"]
+    filterset_fields = ["construction", "company__user__username", "status"]
 
     def create(self, request: Request) -> Response:
         hiring, created = HireModel.objects.get_or_create(

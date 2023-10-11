@@ -358,8 +358,10 @@ class CompanyOverviewViewSet(ModelViewSet):
             data = request.data
             user = request.user
             overview = CompanyOverviewModel.objects.get(user=user)
-            overview.pr_text = data["pr_text"]
-            overview.pr_image = data["pr_image"]
+            if "pr_text" in data:
+                overview.pr_text = data["pr_text"]
+            if "pr_image" in data:
+                overview.pr_image = data["pr_image"]
             overview.save()
 
             return Response(data=CompanyOverviewSerializer(overview).data, status=status.HTTP_206_PARTIAL_CONTENT)
