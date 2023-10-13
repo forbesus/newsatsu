@@ -22,7 +22,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
             Q(user=self.request.user)
             & ~Q(notify_type=ContentType.objects.get_for_model(UserTokenModel))
             & ~Q(notify_type=ContentType.objects.get_for_model(User))
-        ).order_by("-created_at")
+        ).order_by("on_site", "-created_at")
 
         return queryset
 
