@@ -103,7 +103,7 @@ class RequestCompanyModel(models.Model):
     )
 
     def __str__(self):
-        return f"{self.company.user.name}"
+        return f"{self.construction.name}"
 
     class Meta:
         unique_together = ("company", "construction")
@@ -171,6 +171,10 @@ class BidModel(TimeStampModel):
         unique_together = ("company", "construction")
         verbose_name = "入札会社"
         verbose_name_plural = "入札会社"
+
+    def __str__(self) -> str:
+        return self.construction.name
+    
 
     @staticmethod
     def has_read_permission(request):
