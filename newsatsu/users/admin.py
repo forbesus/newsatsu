@@ -48,7 +48,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "house_number",
                     "building_name",
                     "url",
-                    # "password",
+                    "password",
                     "is_allow",
                 )
             },
